@@ -1,0 +1,351 @@
+{
+	"PrivacyPolicyModal": {
+		"states": [
+			"isPrivacyPolicyModalVisible"
+		],
+		"actions": [
+			"togglePrivacyPolicyModalVisibilityFromModal"
+		]
+	},
+	"About": {
+		"states": [
+			"isPrivacyPolicyModalVisible"
+		],
+		"actions": [
+			"togglePrivacyPolicyModalVisibility"
+		]
+	},
+	"AlgorithmsGrid": {
+		"states": [
+			"algorithms",
+			"areAlgorithmsDownloaded",
+			"completedAlgorithms",
+			"isAlgorithmsModalVisible",
+			"selectedAlgorithm: name, mask, solutions"
+		],
+		"actions": [
+			"addToCompletedAlgorithms",
+			"removeFromCompletedAlgorithms",
+			"setAlgorithms",
+			"setAlgorithmsDownloadedStatus",
+			"setCompletedAlgorithms",
+			"setSelectedAlgorithm",
+			"toggleAlgorithmsModalVisibility"
+		]
+	},
+	"SelectAlgorithms": {
+		"states": [],
+		"actions": []
+	},
+	"AlgorithmsModal": {
+		"states": [
+			"isAlgorithmsModalVisible",
+			"selectedAlgorithmIndex"
+		],
+		"actions": [
+			"setSelectedAlgorithmIndex",
+			"toggleAlgorithmsModalVisibilityFromModal"
+		]
+	},
+	"Algorithms": {
+		"states": [],
+		"actions": []
+	},
+	"EditScrambleModal": {
+		"states": [
+			"isEditScrambleModalVisible",
+			"scrambleText"
+		],
+		"actions": [
+			"addToScrambleText",
+			"clearScrambleText",
+			"removeFromScrambleText",
+			"toggleEditScrambleModalVisibilityFromModal"
+		]
+	},
+	"SelectPuzzleModal": {
+		"states": [
+			"isSelectPuzzleModalVisible"
+		],
+		"actions": [
+			"toggleSelectPuzzleModalVisibilityFromModal"
+		]
+	},
+	"SortOptionsModal": {
+		"states": [
+			"isSortOptionsModalVisible"
+		],
+		"actions": [
+			"toggleSortOptionsModalVisibilityFromModal"
+		]
+	},
+	"Home": {
+		"states": [
+			"drawerItemIndex",
+			"isDeleteHeaderIconVisible",
+			"isEditPuzzleModalVisible",
+			"isEditScrambleModalVisible",
+			"isManualMode",
+			"isSearchBarVisible",
+			"isSelectAlgorithmsVisible",
+			"isSelectPuzzleModalVisible",
+			"isSolvesScreenHeaderIconsVisible",
+			"isSortOptionsVisible",
+			"puzzle",
+			"scrambleData",
+			"searchText",
+			"sortOrder",
+			"timerScreenHeaderIconIndex"
+		],
+		"actions": [
+			"setDrawerItemIndex",
+			"toggleDeleteHeaderIconVisibility",
+			"toggleEditScrambleModalVisibility",
+			"toggleSearchBarVisibility",
+			"toggleSelectAlgorithmsVisibility",
+			"toggleSelectPuzzleModalVisibility",
+			"toggleSolvesScreenHeaderIconsVisibility",
+			"toggleSortOptionsVisibility",
+			"setPuzzle",
+			"setScrambleData",
+			"setSearchText",
+			"setSortOrder",
+			"setTimerScreenHeaderIconIndex"
+		]
+	},
+	"EditProfile": {
+		"states": [],
+		"actions": []
+	},
+	"SignInSignUp": {
+		"states": [],
+		"actions": []
+	},
+	"NavigationDrawer": {
+		"states": [
+			"email",
+			"firstName",
+			"headerImage",
+			"isEditProfileVisible",
+			"isSignInSignUpVisible",
+			"lastName",
+			"password",
+			"profilePicture"
+		],
+		"actions": [
+			"setEmail",
+			"setFirstName",
+			"setHeaderImage",
+			"toggleEditProfileVisibility",
+			"toggleSignInSignUpVisibility",
+			"setLastName",
+			"setPassword",
+			"setProfilePicture"
+		]
+	},
+	"PatternsGrid": {
+		"states": [
+			"arePatternsDownloaded",
+			"isPatternsModalVisible",
+			"completedPatterns",
+			"patternName",
+			"patterns"
+		],
+		"actions": [
+			"setPatternsDownloadedStatus",
+			"togglePatternsModalVisibility",
+			"setCompletedPatterns",
+			"addToCompletedPatterns",
+			"removeFromCompletedPatterns",
+			"setPatternName",
+			"setPatterns"
+		]
+	},
+	"PatternsModal": {
+		"states": [
+			"isPatternsModalVisible",
+			"isPatternCompleted",
+			"selectedAlgorithmIndex"
+		],
+		"actions": [
+			"togglePatternsModalVisibility",
+			"togglePatternCompletedStatus",
+			"setSelectedAlgorithmIndex"
+		]
+	},
+	"Patterns": {
+		"states": [],
+		"actions": []
+	},
+	"AlgorithmsSettings": {
+		"states": [],
+		"actions": []
+	},
+	"GeneralSettings": {
+		"states": [],
+		"actions": []
+	},
+	"TimerSettings": {
+		"states": [
+			"timerSettings: alertOnInspectionTimeLeft, alertType, alertTypeModalOffset, inspectionDuration, isAlertTypeModalVisible, isInspectionDurationModalVisible, isInspectionEnabled, isManualMode, shouldAlertOnBestAverage, shouldAlertOnBestTime, shouldAlertOnWorstTime, shouldBackCancelSolve, shouldGenerateScrambles, shouldHoldToStart"
+		],
+		"actions": [
+			"setTimerSettings"
+		]
+	},
+	"AlertTypeModal": {
+		"states": [],
+		"actions": []
+	},
+	"InspectionDurationModal": {
+		"states": [],
+		"actions": []
+	},
+	"LanguageModal": {
+		"states": [],
+		"actions": []
+	},
+	"Settings": {
+		"states": [
+			"isAlgorithmsSettingsVisible",
+			"isGeneralSettingsVisible",
+			"isLanguageModalVisible",
+			"isTimerSettingsUpdated",
+			"isTimerSettingsVisible",
+			"language"
+		],
+		"actions": [
+			"toggleAlgorithmsSettingsVisible",
+			"toggleGeneralSettingsVisible",
+			"toggleLanguageModalVisible",
+			"toggleTimerSettingsUpdated",
+			"toggleTimerSettingsVisible",
+			"setLanguage"
+		]
+	},
+	"Theme": {
+		"states": [
+			"theme"
+		],
+		"actions": [
+			"toggleTheme"
+		]
+	},
+	"SolvesScreen": {
+		"states": [
+			"areSolvesSorted",
+			"isInSolvesSelectionMode",
+			"isSolvesModalVisible",
+			"isSortOptionModalVisible",
+			"selectedSolves",
+			"shouldDeleteSolves",
+			"shouldUpdateSolves",
+			"solveData: id, time, date, scrambleText, scrambleImage, penalty, comments",
+			"solves",
+			"solvesSortOption: sortBy, sortOrder"
+		],
+		"actions": [
+			"toggleSolvesSortedStatus",
+			"toggleSolvesSelectionMode",
+			"toggleSolvesModalVisibility",
+			"toggleSortOptionModalVisibility",
+			"setSelectedSolves",
+			"addToSelectedSolves",
+			"removeFromSelectedSolves",
+			"toggleDeleteSolvesStatus",
+			"toggleUpdateSolvesStatus",
+			"setSolveData",
+			"setSolves",
+			"addToSolves",
+			"removeLatestSolve",
+			"setSolvesSortOption"
+		]
+	},
+	"StatsScreen": {
+		"states": [
+			"allSolves",
+			"ao12Solves",
+			"bestSolves",
+			"penaltySolves",
+			"shouldUpdateStats"
+		],
+		"actions": [
+			"setAllSolves",
+			"setAo12Solves",
+			"setBestSolves",
+			"setPenaltySolves",
+			"toggleUpdateStatsStatus"
+		]
+	},
+	"Stopwatch": {
+		"states": [
+			"inspectionPenalty",
+			"inspectionTime",
+			"isInspectionTimerOn",
+			"isPressTimerOn",
+			"isStopwatchOn",
+			"latestSolve: id, date, time, scrambleText, scrambleImage, penalty, penalizedTime, comments",
+			"pressTime",
+			"shouldRefreshScramble",
+			"shouldResetTimer",
+			"time"
+		],
+		"actions": [
+			"setInspectionPenalty",
+			"setInspectionTime",
+			"updateInspectionTime",
+			"toggleInspectionTimerOnStatus",
+			"togglePressTimerOnStatus",
+			"toggleTimerOnStatus",
+			"setLatestSolve",
+			"setPressTime",
+			"toggleRefreshScrambleStatus",
+			"toggleResetTimerStatus",
+			"setTime"
+		]
+	},
+	"TimerScreen": {
+		"states": [
+			"isCommentsModalVisible",
+			"isScrambleImageModalVisible",
+			"isStopwatchOptionsVisible",
+			"leftStats",
+			"rightStats",
+			"scrambleImageHeight",
+			"scrambleTextHeight",
+			"stopwatchOptions"
+		],
+		"actions": [
+			"toggleCommentsModalVisibility",
+			"toggleScrambleImageModalVisibility",
+			"toggleStopwatchOptionsVisibility",
+			"setLeftStats",
+			"setRightStats",
+			"setScrambleImageHeight",
+			"setScrambleTextHeight",
+			"setStopwatchOptions",
+		]
+	},
+	"CommentsModal": {
+		"states": [],
+		"actions": []
+	},
+	"ScrambleImageModal": {
+		"states": [],
+		"actions": []
+	},
+	"SolvesModal": {
+		"states": [
+			"isEditCommentsVisible",
+			"isScrambleImageVisible"
+		],
+		"actions": [
+			"toggleEditCommentsVisibility",
+			"toggleScrambleImageVisibility"
+		]
+	},
+	"Timer": {
+		"states": [],
+		"actions": []
+	},
+}
