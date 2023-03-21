@@ -19,88 +19,76 @@ import {colors} from '_features/theme';
 import {strings} from '_data/strings';
 import {setDrawerItemIndex} from '_features/home/redux/homeSlice';
 import {
+  setUsername,
+  setProfile,
   toggleEditProfileVisibility,
   toggleSignInSignUpVisibility,
+  setLoggedInStatus,
 } from './redux/navigationDrawerSlice';
 import EditProfile from './modals/EditProfile';
 import SignInSignUp from './modals/SignInSignUp';
 import styles from './styles/navigationDrawerStyle';
+import {toggleSignInSignUpVisibilityFromModal} from './redux/signInSignUpSlice';
+import {
+  setEmailFromModal,
+  setProfileFromModal,
+  setUsernameFromModal,
+  toggleEditProfileVisibilityFromModal,
+} from './redux/editProfileSlice';
+import {loadFromLocalStorage} from '../../libs';
+import {constants} from '../../data/constants';
 
 const NavigationDrawer = ({props}) => {
   const drawerItemIndex = useSelector(state => state.home.drawerItemIndex);
-  const email = useSelector(state => state.navigationDrawer.email);
-  const firstName = useSelector(state => state.navigationDrawer.firstName);
+  const isLoggedIn = useSelector(state => state.navigationDrawer.isLoggedIn);
   const isEditProfileVisible = useSelector(
     state => state.navigationDrawer.isEditProfileVisible,
   );
   const isSignInSignUpVisible = useSelector(
     state => state.navigationDrawer.isSignInSignUpVisible,
   );
-  const lastName = useSelector(state => state.navigationDrawer.firstName);
-  const password = useSelector(state => state.navigationDrawer.firstName);
-  const profilePicture = useSelector(
-    state => state.navigationDrawer.profilePicture,
-  );
+  const profile = useSelector(state => state.navigationDrawer.profile);
+  const username = useSelector(state => state.navigationDrawer.username);
 
   const dispatch = useDispatch();
 
-  const _retrieveUserSession = async () => {
-    try {
-      // const session = await EncryptedStorage.getItem('userSession');
-      // if (session !== undefined) {
-      // const data = JSON.parse(session);
-      // dispatch(setHeaderImage(data.headerImage));
-      // dispatch(setProfilePicture(data.profilePicture));
-      // dispatch(setFirstName(data.firstName));
-      // dispatch(setLastName(data.lastName));
-      // dispatch(setEmail(data.email));
-      // dispatch(setPassword(data.password));
-      // }
-      // return session;
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
-    _retrieveUserSession();
-  }, []);
-
-  console.log(drawerItemIndex);
+    loadFromLocalStorage('userData').then(userData => {
+      if (userData !== null) {
+        dispatch(setLoggedInStatus(true));
+        dispatch(setUsername(userData.username));
+        dispatch(setProfile(userData.profile));
+        dispatch(setProfileFromModal(userData.profile));
+        dispatch(setEmailFromModal(userData.email));
+        dispatch(setUsernameFromModal(userData.username));
+      }
+    });
+  }, [dispatch, isLoggedIn]);
 
   return (
     <View style={styles.drawerView}>
       {isSignInSignUpVisible && <SignInSignUp />}
-      {isEditProfileVisible && (
-        <EditProfile
-          firstName={firstName}
-          lastName={lastName}
-          email={email}
-          password={password}
-        />
-      )}
+      {isEditProfileVisible && <EditProfile />}
       <View style={styles.drawerHeaderView}>
         <Pressable
           style={styles.row}
           onPress={() => {
-            firstName === ''
-              ? dispatch(toggleSignInSignUpVisibility())
-              : dispatch(toggleEditProfileVisibility());
+            if (isLoggedIn) {
+              dispatch(toggleEditProfileVisibility());
+              dispatch(toggleEditProfileVisibilityFromModal());
+            } else {
+              dispatch(toggleSignInSignUpVisibility());
+              dispatch(toggleSignInSignUpVisibilityFromModal());
+            }
           }}>
           <Avatar
-            rounded={true}
             size="large"
-            icon={{
-              name: 'user',
-              type: 'font-awesome',
-              color: colors.blue,
-            }}
-            source={profilePicture ? {uri: profilePicture} : {}}
+            source={{uri: isLoggedIn ? profile : constants.placeholderUser}}
             overlayContainerStyle={styles.avatarBackground}
             containerStyle={styles.avatar}
           />
           <Text style={styles.profileName}>
-            {firstName === '' ? strings.signIn : firstName}
+            {isLoggedIn ? username : strings.signIn}
           </Text>
         </Pressable>
       </View>

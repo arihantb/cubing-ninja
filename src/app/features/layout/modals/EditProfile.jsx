@@ -1,145 +1,189 @@
 import Modal from 'react-native-modal';
-import React, {memo, useCallback, useState} from 'react';
-import {Avatar, Button, Input} from 'react-native-elements';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import React, {memo, useCallback, useEffect} from 'react';
+import {Avatar} from 'react-native-elements';
 import {Pressable, View} from 'react-native';
-import {faCheck} from '@fortawesome/free-solid-svg-icons';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {useDispatch, useSelector} from 'react-redux';
 import {Header} from '_components';
-import {colors} from '_features/theme';
 import {strings} from '_data/strings';
+import styles from '../styles/editProfileStyle';
 import {
-  setEmail,
-  setFirstName,
-  setHeaderImage,
-  setLastName,
-  setProfilePicture,
-  toggleEditProfileSubmitVisibility,
+  setEmailFromModal,
+  setProfileFromModal,
+  setUsernameFromModal,
+  toggleChangeEmailModalVisibility,
+  toggleChangePasswordModalVisibility,
+  toggleChangeUsernameModalVisibility,
+  toggleConfirmDeleteAccountModalVisibility,
+  toggleEditProfileVisibilityFromModal,
+} from '../redux/editProfileSlice';
+import {
+  setLoggedInStatus,
+  setProfile,
   toggleEditProfileVisibility,
 } from '../redux/navigationDrawerSlice';
-import styles from '../styles/editProfileStyle';
+import {Text} from '../../../components';
+import {loadFromLocalStorage, saveToLocalStorage} from '../../../libs';
+import auth from '@react-native-firebase/auth';
+import {toggleChangeEmailModalVisibilityFromModal} from '../redux/changeEmailModalSlice';
+import {toggleChangePasswordModalVisibilityFromModal} from '../redux/changePasswordModalSlice';
+import ChangeEmailModal from './ChangeEmailModal';
+import ChangePasswordModal from './ChangePasswordModal';
+import {constants} from '../../../data/constants';
+import ChangeUsernameModal from './ChangeUsernameModal';
+import {toggleChangeUsernameModalVisibilityFromModal} from '../redux/changeUsernameModalSlice';
+import {removeFromLocalStorage} from '../../../libs/localStorageManagement';
+import ConfirmDeleteAccountModal from './ConfirmDeleteAccountModal';
+import {toggleConfirmDeleteAccountModalVisibilityFromModal} from '../redux/confirmDeleteAccountModalSlice';
+import {useNetInfo} from '@react-native-community/netinfo';
 
 const EditProfile = () => {
-  const email = useSelector(state => state.navigationDrawer.email);
-  const firstName = useSelector(state => state.navigationDrawer.firstName);
-  const isEditProfileVisible = useSelector(
-    state => state.navigationDrawer.isEditProfileVisible,
-  );
-  const lastName = useSelector(state => state.navigationDrawer.lastName);
-  const profilePicture = useSelector(
-    state => state.navigationDrawer.profilePicture,
-  );
+  const netInfo = useNetInfo();
 
-  const [visible, setVisible] = useState(true);
-  const [firstNameTemp, setFirstNameTemp] = useState(firstName);
-  const [lastNameTemp, setLastNameTemp] = useState(lastName);
-  const [emailTemp, setEmailTemp] = useState(email);
+  const username = useSelector(state => state.editProfile.username);
+  const email = useSelector(state => state.editProfile.email);
+  const profile = useSelector(state => state.editProfile.profile);
+  const isEditProfileVisible = useSelector(
+    state => state.editProfile.isEditProfileVisible,
+  );
+  const isChangeEmailModalVisible = useSelector(
+    state => state.editProfile.isChangeEmailModalVisible,
+  );
+  const isChangePasswordModalVisible = useSelector(
+    state => state.editProfile.isChangePasswordModalVisible,
+  );
+  const isChangeUsernameModalVisible = useSelector(
+    state => state.editProfile.isChangeUsernameModalVisible,
+  );
+  const isLoggedIn = useSelector(state => state.navigationDrawer.isLoggedIn);
+  const isConfirmDeleteAccountModalVisible = useSelector(
+    state => state.editProfile.isConfirmDeleteAccountModalVisible,
+  );
 
   const dispatch = useDispatch();
 
-  const avatarPickerCallback = useCallback(response => {
-    if (!response.didCancel) setProfilePicture(response.assets[0].uri);
-  }, []);
+  const avatarPickerCallback = useCallback(
+    response => {
+      if (!response.didCancel) {
+        dispatch(setProfileFromModal(response.assets[0].uri));
+        dispatch(setProfile(response.assets[0].uri));
+        loadFromLocalStorage('userData').then(userData => {
+          userData.profile = response.assets[0].uri;
 
-  const headerPickerCallback = useCallback(response => {
-    if (!response.didCancel) setHeaderImage(response.assets[0].uri);
-  }, []);
+          try {
+            auth().currentUser.updateProfile({
+              photoURL: response.assets[0].uri,
+            });
+          } catch (err) {
+            console.log(err);
+          }
+
+          saveToLocalStorage('userData', userData);
+        });
+      }
+    },
+    [dispatch],
+  );
+
+  useEffect(() => {
+    loadFromLocalStorage('userData').then(userData =>
+      dispatch(setEmailFromModal(userData.email)),
+    );
+  }, [dispatch, isChangeEmailModalVisible]);
+
+  useEffect(() => {
+    loadFromLocalStorage('userData').then(userData =>
+      dispatch(setUsernameFromModal(userData.username)),
+    );
+  }, [dispatch, isChangeUsernameModalVisible]);
 
   return (
     <Modal
-      onBackdropPress={() => setVisible(false)}
+      onBackButtonPress={() => dispatch(toggleEditProfileVisibilityFromModal())}
       onModalHide={() => dispatch(toggleEditProfileVisibility())}
       animationIn="slideInRight"
       animationOut="slideOutRight"
       hasBackdrop={false}
       style={styles.modalView}
-      isVisible={visible}>
+      isVisible={isEditProfileVisible}>
+      {isChangeEmailModalVisible && <ChangeEmailModal />}
+      {isChangePasswordModalVisible && <ChangePasswordModal />}
+      {isChangeUsernameModalVisible && <ChangeUsernameModal />}
+      {isConfirmDeleteAccountModalVisible && <ConfirmDeleteAccountModal />}
       <View style={styles.modalContainer}>
         <Header
           title={strings.profile}
-          setVisible={setVisible}
-          right={
-            isEditProfileVisible && (
+          hideModal={() => dispatch(toggleEditProfileVisibilityFromModal())}
+        />
+        {netInfo.isConnected && netInfo.isInternetReachable ? (
+          <>
+            <Pressable
+              onPress={() => launchImageLibrary({}, avatarPickerCallback)}>
+              <Avatar
+                size="large"
+                source={{uri: isLoggedIn ? profile : constants.placeholderUser}}
+                overlayContainerStyle={styles.avatarBackground}
+                containerStyle={styles.avatar}
+              />
+            </Pressable>
+            <View style={styles.row}>
+              <Text style={styles.label}>Username</Text>
               <Pressable
                 onPress={() => {
-                  dispatch(setFirstName(firstNameTemp));
-                  dispatch(setLastName(lastNameTemp));
-                  dispatch(setEmail(emailTemp));
-                  setVisible(false);
+                  dispatch(toggleChangeUsernameModalVisibility());
+                  dispatch(toggleChangeUsernameModalVisibilityFromModal());
                 }}>
-                <FontAwesomeIcon
-                  icon={faCheck}
-                  color={colors.white}
-                  size={20}
-                />
+                <Text style={styles.username}>{username}</Text>
               </Pressable>
-            )
-          }
-        />
-        <View style={styles.headerView}>
-          <Pressable
-            style={styles.avatar}
-            onPress={() => launchImageLibrary({}, avatarPickerCallback)}>
-            <Avatar
-              rounded={true}
-              size={100}
-              icon={{
-                name: 'user',
-                type: 'font-awesome',
-                color: colors.blue,
-              }}
-              source={{uri: profilePicture}}
-              overlayContainerStyle={styles.avatarBackground}>
-              <Avatar.Accessory size={25} style={styles.avatarPencil} />
-            </Avatar>
-          </Pressable>
-          <View style={styles.editingView}>
-            <View style={styles.row}>
-              <View style={styles.flex}>
-                <Input
-                  placeholder={strings.firstName}
-                  defaultValue={firstName}
-                  inputContainerStyle={styles.inputContainer}
-                  inputStyle={styles.input}
-                  onChangeText={text => {
-                    setFirstNameTemp(text);
-                    text === firstName &&
-                      dispatch(toggleEditProfileSubmitVisibility());
-                  }}
-                />
-              </View>
-              <View style={styles.flex}>
-                <Input
-                  placeholder={strings.lastName}
-                  defaultValue={lastName}
-                  inputContainerStyle={styles.inputContainer}
-                  inputStyle={styles.input}
-                  onChangeText={text => {
-                    setLastNameTemp(text);
-                    text === lastName &&
-                      dispatch(toggleEditProfileSubmitVisibility());
-                  }}
-                />
-              </View>
             </View>
-            <Input
-              placeholder={strings.email}
-              defaultValue={email}
-              inputContainerStyle={styles.inputContainer}
-              inputStyle={styles.input}
-              onChangeText={text => {
-                setEmailTemp(text);
-                text === email && dispatch(toggleEditProfileSubmitVisibility());
-              }}
-            />
-            <Button
-              type="clear"
-              title={strings.changePassword}
-              onPress={() => {}}
-            />
+            <View style={styles.row}>
+              <Text style={styles.label}>Email</Text>
+              <Pressable
+                onPress={() => {
+                  dispatch(toggleChangeEmailModalVisibility());
+                  dispatch(toggleChangeEmailModalVisibilityFromModal());
+                }}>
+                <Text style={styles.email}>{email}</Text>
+              </Pressable>
+            </View>
+            <View style={styles.row}>
+              <Pressable
+                onPress={() => {
+                  dispatch(toggleChangePasswordModalVisibility());
+                  dispatch(toggleChangePasswordModalVisibilityFromModal());
+                }}>
+                <Text style={styles.password}>{strings.changePassword}</Text>
+              </Pressable>
+            </View>
+            <View style={styles.row}>
+              <Pressable
+                onPress={() => {
+                  dispatch(toggleConfirmDeleteAccountModalVisibility());
+                  dispatch(
+                    toggleConfirmDeleteAccountModalVisibilityFromModal(),
+                  );
+                }}>
+                <Text style={styles.deleteAccount}>
+                  {strings.deleteAccount}
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => {
+                  auth().signOut();
+                  removeFromLocalStorage('userData').then(() =>
+                    dispatch(setLoggedInStatus(false)),
+                  );
+                  dispatch(toggleEditProfileVisibilityFromModal());
+                }}>
+                <Text style={styles.signOut}>{strings.signOut}</Text>
+              </Pressable>
+            </View>
+          </>
+        ) : (
+          <View style={styles.noInternet}>
+            <Text style={styles.noInternetText}>No Internet</Text>
           </View>
-        </View>
+        )}
       </View>
     </Modal>
   );

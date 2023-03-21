@@ -10,7 +10,16 @@ import {
   selectPuzzleModalReducer,
   sortOptionsModalReducer,
 } from '_features/home';
-import {navigationDrawerReducer} from '_features/layout';
+import {
+  changePasswordModalReducer,
+  forgotPasswordModalReducer,
+  changeEmailModalReducer,
+  changeUsernameModalReducer,
+  editProfileReducer,
+  navigationDrawerReducer,
+  signInSignUpReducer,
+  confirmDeleteAccountModalReducer,
+} from '_features/layout';
 import {patternsGridReducer, patternsModalReducer} from '_features/patterns';
 import {settingsReducer, timerSettingsReducer} from '_features/settings';
 import {themeReducer} from '_features/theme';
@@ -27,6 +36,12 @@ const store = configureStore({
     about: aboutReducer,
     algorithmsGrid: algorithmsGridReducer,
     algorithmsModal: algorithmsModalReducer,
+    changePasswordModal: changePasswordModalReducer,
+    changeUsernameModal: changeUsernameModalReducer,
+    forgotPasswordModal: forgotPasswordModalReducer,
+    changeEmailModal: changeEmailModalReducer,
+    editProfile: editProfileReducer,
+    confirmDeleteAccountModal: confirmDeleteAccountModalReducer,
     editScrambleModal: editScrambleModalReducer,
     home: homeReducer,
     navigationDrawer: navigationDrawerReducer,
@@ -35,6 +50,7 @@ const store = configureStore({
     privacyPolicyModal: privacyPolicyModalReducer,
     selectPuzzleModal: selectPuzzleModalReducer,
     settings: settingsReducer,
+    signInSignUp: signInSignUpReducer,
     solvesModal: solvesModalReducer,
     solvesScreen: solvesScreenReducer,
     sortOptionsModal: sortOptionsModalReducer,

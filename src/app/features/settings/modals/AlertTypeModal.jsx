@@ -11,6 +11,7 @@ import {
   toggleAlertTypeModalVisibility,
 } from '../redux/settingsSlice';
 import styles from '../styles/alertTypeModalStyle';
+import {sound, soundVibrate, vibrate} from '../../../assets/images';
 
 const AlertTypeModal = props => {
   const [visible, setVisible] = useState(true);
@@ -50,7 +51,7 @@ const AlertTypeModal = props => {
             setVisible(false);
           }}>
           <Image
-            source={require('_assets/images/sound.png')}
+            source={{uri: sound}}
             style={{
               margin: 10,
               width: 20,
@@ -82,7 +83,7 @@ const AlertTypeModal = props => {
             setVisible(false);
           }}>
           <Image
-            source={require('_assets/images/vibrate.png')}
+            source={{uri: vibrate}}
             style={{
               margin: 10,
               width: 20,
@@ -113,7 +114,7 @@ const AlertTypeModal = props => {
             setVisible(false);
           }}>
           <Image
-            source={require('_assets/images/sound_vibrate.png')}
+            source={{uri: soundVibrate}}
             style={{
               margin: 10,
               width: 20,

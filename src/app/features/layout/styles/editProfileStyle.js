@@ -36,21 +36,13 @@ export default StyleSheet.create({
     fontSize: 20,
   },
   avatarBackground: {
-    backgroundColor: colors.white,
+    borderRadius: 100,
   },
   avatar: {
-    backgroundColor: 'red',
-    width: 100,
-    top: -100,
+    width: 110,
+    height: 110,
+    margin: 50,
     alignSelf: 'center',
-  },
-  avatarPencil: {
-    top: 70,
-    backgroundColor: colors.blue,
-  },
-  editingView: {
-    flex: 1,
-    marginTop: 50,
   },
   inputContainer: {
     borderWidth: 2,
@@ -62,9 +54,46 @@ export default StyleSheet.create({
     color: colors.white,
   },
   row: {
+    margin: 20,
     flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   flex: {
     flex: 1,
+  },
+  password: {
+    color: colors.blueLight,
+    fontSize: 18,
+  },
+  deleteAccount: {
+    color: colors.red,
+    fontSize: 18,
+  },
+  username: {
+    color: colors.blueLight,
+    fontSize: 18,
+  },
+  email: {
+    color: colors.blueLight,
+    fontSize: 18,
+  },
+  label: {
+    fontSize: 18,
+  },
+  signOut: {
+    color: colors.red,
+    fontSize: 18,
+  },
+  rowEnd: {
+    margin: 20,
+    alignSelf: 'flex-end',
+  },
+  noInternet: {
+    backgroundColor: colors.red,
+    padding: 10,
+    alignItems: 'center',
+  },
+  noInternetText: {
+    fontSize: 18,
   },
 });

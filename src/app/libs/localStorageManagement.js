@@ -8,8 +8,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const saveToLocalStorage = async (key, data) => {
   try {
     await AsyncStorage.setItem(key, JSON.stringify(data));
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
   }
 };
 
@@ -22,7 +22,30 @@ export const loadFromLocalStorage = async key => {
   try {
     const data = await AsyncStorage.getItem(key);
     return data != null ? JSON.parse(data) : null;
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+/**
+ * Removes the data for the given key from the local storage.
+ * @param {string} key the key of the data to be removed.
+ */
+export const removeFromLocalStorage = async key => {
+  try {
+    await AsyncStorage.removeItem(key);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+/**
+ * Clears the local storage.
+ */
+export const clearLocalStorage = async () => {
+  try {
+    await AsyncStorage.clear();
+  } catch (err) {
+    console.log(err);
   }
 };

@@ -9,62 +9,75 @@ import {colors} from '_features/theme';
 import {setPuzzle, toggleSelectPuzzleModalVisibility} from '../redux/homeSlice';
 import {toggleSelectPuzzleModalVisibilityFromModal} from '../redux/selectPuzzleModalSlice';
 import styles from '../styles/selectPuzzleModalStyle';
+import {
+  clock,
+  fiveByFive,
+  fourByFour,
+  megaminx,
+  pyraminx,
+  sevenBySeven,
+  sixBySix,
+  skewb,
+  square1,
+  threeByThree,
+  twoByTwo,
+} from '../../../assets/images';
 
 const data = [
   {
     puzzle: 0,
     name: strings.twoByTwo,
-    image: require('_assets/images/2x2.png'),
+    image: twoByTwo,
   },
   {
     puzzle: 1,
     name: strings.threeByThree,
-    image: require('_assets/images/3x3.png'),
+    image: threeByThree,
   },
   {
     puzzle: 2,
     name: strings.fourByFour,
-    image: require('_assets/images/4x4.png'),
+    image: fourByFour,
   },
   {
     puzzle: 3,
     name: strings.fiveByFive,
-    image: require('_assets/images/5x5.png'),
+    image: fiveByFive,
   },
   {
     puzzle: 4,
     name: strings.sixBySix,
-    image: require('_assets/images/6x6.png'),
+    image: sixBySix,
   },
   {
     puzzle: 5,
     name: strings.sevenBySeven,
-    image: require('_assets/images/7x7.png'),
+    image: sevenBySeven,
   },
   {
     puzzle: 6,
     name: strings.skewb,
-    image: require('_assets/images/skewb.png'),
+    image: skewb,
   },
   {
     puzzle: 7,
     name: strings.megaminx,
-    image: require('_assets/images/megaminx.png'),
+    image: megaminx,
   },
   {
     puzzle: 8,
     name: strings.pyraminx,
-    image: require('_assets/images/pyraminx.png'),
+    image: pyraminx,
   },
   {
     puzzle: 9,
     name: strings.square1,
-    image: require('_assets/images/square-1.png'),
+    image: square1,
   },
   {
     puzzle: 10,
     name: strings.clock,
-    image: require('_assets/images/clock.png'),
+    image: clock,
   },
 ];
 
@@ -90,7 +103,7 @@ const SelectPuzzleModal = () => {
           },
           styles.puzzleView,
         ]}>
-        <Image style={styles.image} source={item.image} />
+        <Image style={styles.image} source={{uri: item.image}} />
         <Text
           style={[
             {color: puzzle === item.puzzle ? colors.greyLight : colors.grey},

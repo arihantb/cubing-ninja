@@ -1,4 +1,6 @@
 export const constants = {
+  emailRegex: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+  placeholderUser: 'https://t.ly/Jig-',
   emptyString: '',
   space: ' ',
   colon: ':',

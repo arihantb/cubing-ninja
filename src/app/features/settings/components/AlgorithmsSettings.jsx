@@ -9,6 +9,7 @@ import {colors} from '_features/theme';
 import AlertTypeModal from '../modals/AlertTypeModal';
 import InspectionDurationModal from '../modals/InspectionDurationModal';
 import styles from '../styles/generalSettingsStyle';
+import { sound, soundVibrate, vibrate } from '../../../assets/images';
 
 const AlgorithmsSettings = props => {
   const [visible, setVisible] = useState(true);
@@ -79,13 +80,14 @@ const AlgorithmsSettings = props => {
       right: (
         <Pressable onPress={() => setShowAlertTypeModal(true)}>
           <Image
-            source={
-              alertType === 'Both'
-                ? require('_assets/images/sound_vibrate.png')
-                : alertType === 'Sound'
-                ? require('_assets/images/sound.png')
-                : require('_assets/images/vibrate.png')
-            }
+            source={{
+              uri:
+                alertType === 'Both'
+                  ? soundVibrate
+                  : alertType === 'Sound'
+                  ? sound
+                  : vibrate,
+            }}
             style={{width: 30, height: 30}}
           />
         </Pressable>

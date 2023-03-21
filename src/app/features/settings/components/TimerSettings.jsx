@@ -1,11 +1,14 @@
 import Modal from 'react-native-modal';
 import React, {memo, useState} from 'react';
-import {Image, Pressable, SectionList, View} from 'react-native';
+import {Image, Pressable, SectionList, ToastAndroid, View} from 'react-native';
 import {Switch} from 'react-native-elements';
 import {useDispatch, useSelector} from 'react-redux';
+import auth from '@react-native-firebase/auth';
+import database from '@react-native-firebase/database';
 import {Header, Text} from '_components';
 import {strings} from '_data/strings';
 import {colors} from '_features/theme';
+import {setSolves as setSolvesFromSolvesScreen} from '../../timer/redux/solvesScreenSlice';
 import AlertTypeModal from '../modals/AlertTypeModal';
 import InspectionDurationModal from '../modals/InspectionDurationModal';
 import {
@@ -24,15 +27,69 @@ import {
   toggleTimerSettingsVisibility,
 } from '../redux/settingsSlice';
 import styles from '../styles/timerSettingsStyle';
+import {sound, soundVibrate, vibrate} from '../../../assets/images';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faDownload, faUpload} from '@fortawesome/free-solid-svg-icons';
+import {getSolves, setSolves} from '../../../utils';
 
 const TimerSettings = () => {
   const timerSettings = useSelector(state => state.timerSettings.timerSettings);
+  const puzzle = useSelector(state => state.home.puzzle);
+  const isLoggedIn = useSelector(state => state.navigationDrawer.isLoggedIn);
 
   const [visible, setVisible] = useState(true);
 
   const dispatch = useDispatch();
 
   const data = [
+    {
+      title: 'Upload Solves',
+      subtitle: 'Upload the solves to the database',
+      right: (
+        <Pressable
+          onPress={() => {
+            getSolves().then(solves =>
+              database()
+                .ref(`users/${auth().currentUser.uid}`)
+                .set({solves: solves})
+                .then(() =>
+                  ToastAndroid.show(
+                    'Solves uploaded successfully',
+                    ToastAndroid.LONG,
+                  ),
+                ),
+            );
+          }}>
+          <FontAwesomeIcon icon={faUpload} size={20} color={colors.white} />
+        </Pressable>
+      ),
+      disabled: false,
+    },
+    {
+      title: 'Download Solves',
+      subtitle: 'Download the solves from the database',
+      right: (
+        <Pressable
+          onPress={() => {
+            database()
+              .ref(`users/${auth().currentUser.uid}`)
+              .once('value')
+              .then(snapshot => {
+                setSolves(snapshot.val().solves);
+                dispatch(
+                  setSolvesFromSolvesScreen(snapshot.val().solves[puzzle]),
+                );
+                ToastAndroid.show(
+                  'Solves downloaded successfully',
+                  ToastAndroid.LONG,
+                );
+              });
+          }}>
+          <FontAwesomeIcon icon={faDownload} size={20} color={colors.white} />
+        </Pressable>
+      ),
+      disabled: false,
+    },
     {
       title: 'Inspection',
       subtitle:
@@ -91,13 +148,14 @@ const TimerSettings = () => {
             dispatch(toggleAlertTypeModalVisibility())
           }>
           <Image
-            source={
-              timerSettings.alertType === 'Both'
-                ? require('_assets/images/sound_vibrate.png')
-                : timerSettings.alertType === 'Sound'
-                ? require('_assets/images/sound.png')
-                : require('_assets/images/vibrate.png')
-            }
+            source={{
+              uri:
+                timerSettings.alertType === 'Both'
+                  ? soundVibrate
+                  : timerSettings.alertType === 'Sound'
+                  ? sound
+                  : vibrate,
+            }}
             style={{
               tintColor: timerSettings.alertOnInspectionTimeLeft
                 ? colors.white
@@ -228,8 +286,19 @@ const TimerSettings = () => {
 
   const sections = [
     {
+      title: 'Solves',
+      data: isLoggedIn
+        ? data.slice(0, 2)
+        : [
+            {
+              title: 'Login to View',
+              subtitle: 'Login to sync solves to database',
+            },
+          ],
+    },
+    {
       title: 'Inspection',
-      data: data.slice(0, 4),
+      data: data.slice(2, 4),
     },
     {
       title: 'Timer',
@@ -256,7 +325,7 @@ const TimerSettings = () => {
         <InspectionDurationModal />
       )}
       <View style={styles.mainView}>
-        <Header title={strings.timerSettingsTitle} setVisible={setVisible} />
+        <Header title={strings.timerSettingsTitle} hideModal={setVisible} />
         <SectionList
           itemDimension={100}
           itemContainerStyle={{alignItems: 'center'}}

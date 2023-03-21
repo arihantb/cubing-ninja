@@ -26,7 +26,7 @@ const Header = props => (
 
 Header.propTypes = {
   hideModal: PropTypes.func.isRequired,
-  right: PropTypes.object,
+  right: PropTypes.any,
   title: PropTypes.string.isRequired,
 };
 

@@ -8,7 +8,6 @@ export default StyleSheet.create({
     backgroundColor: colors.primaryLight,
   },
   drawerHeaderView: {
-    alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.primary,
     height: Dimensions.get('window').height / 5,
@@ -38,7 +37,7 @@ export default StyleSheet.create({
     fontSize: 20,
   },
   avatarBackground: {
-    backgroundColor: colors.white,
+    borderRadius: 100,
   },
   avatar: {
     marginLeft: 20,

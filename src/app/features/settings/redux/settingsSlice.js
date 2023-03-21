@@ -13,19 +13,19 @@ export const settingsSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
-    toggleAlgorithmsSettingsVisible: state => {
+    toggleAlgorithmsSettingsVisibility: state => {
       state.isAlgorithmsSettingsVisible = !state.isAlgorithmsSettingsVisible;
     },
-    toggleGeneralSettingsVisible: state => {
+    toggleGeneralSettingsVisibility: state => {
       state.isGeneralSettingsVisible = !state.isGeneralSettingsVisible;
     },
-    toggleLanguageModalVisible: state => {
+    toggleLanguageModalVisibility: state => {
       state.isLanguageModalVisible = !state.isLanguageModalVisible;
     },
     toggleTimerSettingsUpdated: state => {
       state.isTimerSettingsUpdated = !state.isTimerSettingsUpdated;
     },
-    toggleTimerSettingsVisible: state => {
+    toggleTimerSettingsVisibility: state => {
       state.isTimerSettingsVisible = !state.isTimerSettingsVisible;
     },
     setLanguage: (state, action) => {
@@ -35,11 +35,11 @@ export const settingsSlice = createSlice({
 });
 
 export const {
-  toggleAlgorithmsSettingsVisible,
-  toggleGeneralSettingsVisible,
-  toggleLanguageModalVisible,
+  toggleAlgorithmsSettingsVisibility,
+  toggleGeneralSettingsVisibility,
+  toggleLanguageModalVisibility,
   toggleTimerSettingsUpdated,
-  toggleTimerSettingsVisible,
+  toggleTimerSettingsVisibility,
   setLanguage,
 } = settingsSlice.actions;
 
