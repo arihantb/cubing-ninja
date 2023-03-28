@@ -5,16 +5,13 @@ import {Image, Pressable, SectionList, View} from 'react-native';
 import {Switch} from 'react-native-elements';
 import {Header, Text} from '_components';
 import {strings} from '_data/strings';
-import {colors} from '_features/theme';
 import AlertTypeModal from '../modals/AlertTypeModal';
 import InspectionDurationModal from '../modals/InspectionDurationModal';
-import styles from '../styles/generalSettingsStyle';
-import { sound, soundVibrate, vibrate } from '../../../assets/images';
+import {sound, soundVibrate, vibrate} from '../../../assets/images';
 
 const AlgorithmsSettings = props => {
   const [visible, setVisible] = useState(true);
   const [inspection, setInspection] = useState(false);
-  const [hideLearnedAlgorithms, setHideLearnedAlgorithms] = useState(false);
   const [inspectionDuration, setInspectionDuration] = useState(15);
   const [alertTimeLeft, setAlertTimeLeft] = useState(false);
   const [alertType, setAlertType] = useState('Both');
@@ -59,7 +56,7 @@ const AlgorithmsSettings = props => {
       subtitle: 'Default inspection duration: 15 seconds',
       right: (
         <Pressable onPress={() => setShowInspectionDurationModal(true)}>
-          <Text style={{fontSize: 18}}>{inspectionDuration}s</Text>
+          <Text>{inspectionDuration}s</Text>
         </Pressable>
       ),
     },
@@ -88,7 +85,7 @@ const AlgorithmsSettings = props => {
                   ? sound
                   : vibrate,
             }}
-            style={{width: 30, height: 30}}
+            className="h-8 w-8"
           />
         </Pressable>
       ),
@@ -160,24 +157,17 @@ const AlgorithmsSettings = props => {
   ];
 
   const renderItem = ({item}) => (
-    <View style={styles.row}>
-      <View style={styles.swipeTabs}>
-        <Text style={styles.swipeTabsTitle}>{item.title}</Text>
-        <Text style={styles.swipeTabsSubtitle}>{item.subtitle}</Text>
+    <View className="flex-row">
+      <View className="flex-1 m-4">
+        <Text className="mb-2 text-lg">{item.title}</Text>
+        <Text>{item.subtitle}</Text>
       </View>
-      <View style={styles.swipeTabsSwitch}>{item.right}</View>
+      <View className="mr-5 justify-center">{item.right}</View>
     </View>
   );
 
   const renderSectionHeader = ({section}) => (
-    <Text
-      style={{
-        flex: 1,
-        fontSize: 16,
-        backgroundColor: colors.primary,
-        color: 'white',
-        padding: 10,
-      }}>
+    <Text className="flex-1 p-3 bg-neutral-200 dark:bg-neutral-800">
       {section.title}
     </Text>
   );
@@ -205,7 +195,7 @@ const AlgorithmsSettings = props => {
       animationIn="slideInRight"
       animationOut="slideOutRight"
       hasBackdrop={false}
-      style={{margin: 0}}
+      className="m-0"
       isVisible={visible}>
       {showAlertTypeModal ? (
         <AlertTypeModal
@@ -221,7 +211,7 @@ const AlgorithmsSettings = props => {
           inspectionDuration={inspectionDurationCallback}
         />
       ) : null}
-      <View style={styles.mainView}>
+      <View className="flex-1 flex-row bg-neutral-50 dark:bg-neutral-900">
         <Header
           title={strings.algorithmsSettingsTitle}
           setVisible={setVisible}
@@ -229,12 +219,12 @@ const AlgorithmsSettings = props => {
         <SectionList
           itemDimension={100}
           itemContainerStyle={{alignItems: 'center'}}
-          stickySectionHeadersEnabled={true}
+          stickySectionHeadersEnabled
           initialNumToRender={20}
           sections={sections}
           renderItem={renderItem}
           renderSectionHeader={renderSectionHeader}
-          removeClippedSubviews={true}
+          removeClippedSubviews
           getItemLayout={(_, index) => ({
             length: 100,
             offset: 100 * index,

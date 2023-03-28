@@ -22,7 +22,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import {useDispatch, useSelector} from 'react-redux';
 import {Text} from '_components';
-import {colors} from '_features/theme';
 import {
   toggleEditCommentsVisibility,
   toggleScrambleImageVisibility,
@@ -97,8 +96,8 @@ const SolvesModal = props => {
     <Modal
       onBackdropPress={() => setVisible(false)}
       onBackButtonPress={() => setVisible(false)}
-      useNativeDriver={true}
-      useNativeDriverForBackdrop={true}
+      useNativeDriver
+      useNativeDriverForBackdrop
       onModalHide={() => {
         dispatch(
           updateSolve({
@@ -112,50 +111,25 @@ const SolvesModal = props => {
       }}
       backdropTransitionOutTiming={0}
       isVisible={visible}>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <View
-          style={{
-            width: '80%',
-            borderRadius: 10,
-            backgroundColor: 'white',
-          }}>
-          <View
-            style={{
-              margin: 10,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={{color: colors.black, fontSize: 30}}>
+      <View className="flex-1 items-center justify-center">
+        <View className="w-4/5 rounded-md bg-neutral-50 dark:bg-neutral-800">
+          <View className="m-3 flex-row items-center justify-center">
+            <View className="flex-row items-center">
+              <Text className="text-3xl">
                 {penalty === 'DNF' ? 'DNF' : penalizedTime}
               </Text>
               {penalty !== 'DNF' && (
-                <Text style={{marginLeft: 5, color: colors.red, fontSize: 20}}>
-                  {penalty}
-                </Text>
+                <Text className="ml-2 text-red-500 text-lg">{penalty}</Text>
               )}
             </View>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <FontAwesomeIcon icon={faCalendar} color={colors.greyDark} />
-              <Text style={{marginLeft: 10, color: colors.black, fontSize: 12}}>
-                {getDate()}
-              </Text>
+            <View className="flex-row items-center">
+              <FontAwesomeIcon icon={faCalendar} color={'#A8A8A8'} />
+              <Text className="ml-3">{getDate()}</Text>
             </View>
           </View>
-          <Divider color={colors.greyLight} width={1} />
+          <Divider color={'#D2D2D2'} width={1} />
           {isEditCommentsVisible ? (
-            <View
-              style={{
-                marginHorizontal: 15,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
+            <View className="mx-3 flex-row items-center">
               <Input
                 inputStyle={{
                   fontFamily: 'GoogleSans-Bold',
@@ -163,7 +137,7 @@ const SolvesModal = props => {
                   paddingBottom: 0,
                 }}
                 defaultValue={comments}
-                multiline={true}
+                multiline
                 containerStyle={{
                   flex: 1,
                   marginLeft: -10,
@@ -175,10 +149,7 @@ const SolvesModal = props => {
                   comments !== '' && (
                     <Pressable onPress={() => setComments('')}>
                       <View style={{padding: 5}}>
-                        <FontAwesomeIcon
-                          icon={faTimes}
-                          color={colors.greyDark}
-                        />
+                        <FontAwesomeIcon icon={faTimes} color={'#A8A8A8'} />
                       </View>
                     </Pressable>
                   )
@@ -189,60 +160,32 @@ const SolvesModal = props => {
               />
               <Pressable
                 onPress={() => dispatch(toggleEditCommentsVisibility())}>
-                <View style={{padding: 5}}>
-                  <FontAwesomeIcon icon={faCheck} color={colors.green} />
+                <View className="p-3">
+                  <FontAwesomeIcon icon={faCheck} color={'#00FF00'} />
                 </View>
               </Pressable>
             </View>
           ) : (
             comments !== '' && (
-              <View
-                style={{
-                  marginLeft: 15,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <FontAwesomeIcon icon={faStickyNote} color={colors.greyDark} />
+              <View className="ml-4 flex-row items-center">
+                <FontAwesomeIcon icon={faStickyNote} color={'#A8A8A8'} />
                 <ScrollView
-                  style={{maxHeight: 150}}
+                  className="max-h-[150]"
                   showsVerticalScrollIndicator={false}>
-                  <Text
-                    style={{
-                      margin: 15,
-                      marginLeft: 10,
-                      color: colors.black,
-                      fontSize: 16,
-                    }}>
-                    {comments}
-                  </Text>
+                  <Text className="m-4 ml-3">{comments}</Text>
                 </ScrollView>
               </View>
             )
           )}
-          {isEditCommentsVisible && (
-            <Divider color={colors.greyLight} width={1} />
-          )}
+          {isEditCommentsVisible && <Divider color={'#D2D2D2'} width={1} />}
           {solveData.scrambleText !== '' && (
             <Pressable
-              style={{
-                margin: 15,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}
+              className="ml-4 flex-row items-center"
               onPress={() =>
                 isScrambleImageVisible ? heightAnimOut() : heightAnimIn()
               }>
-              <FontAwesomeIcon icon={faVectorSquare} color={colors.greyDark} />
-              <Text
-                style={{
-                  flex: 1,
-                  marginLeft: 10,
-                  marginRight: 10,
-                  color: colors.black,
-                  fontSize: 16,
-                }}>
-                {solveData.scrambleText}
-              </Text>
+              <FontAwesomeIcon icon={faVectorSquare} color={'#A8A8A8'} />
+              <Text className="flex-1 mx-3">{solveData.scrambleText}</Text>
               <Animated.View
                 style={{
                   transform: [
@@ -256,7 +199,7 @@ const SolvesModal = props => {
                 }}>
                 <FontAwesomeIcon
                   icon={faChevronDown}
-                  color={colors.black}
+                  color={'#000000'}
                   size={12}
                 />
               </Animated.View>
@@ -264,34 +207,25 @@ const SolvesModal = props => {
           )}
           {solveData.scrambleImage !== '' && (
             <Animated.View
-              style={{
-                height: heightAnim,
-                overflow: 'hidden',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
+              className={`overflow-hidden items-center justify-center [height:${heightAnim}]`}>
               <SvgXml
                 xml={solveData.scrambleImage}
                 height={150}
                 width={'100%'}
-                style={{marginBottom: 20}}
+                className="mb-5"
               />
             </Animated.View>
           )}
           {solveData.scrambleText !== '' && (
-            <Divider color={colors.greyLight} width={1} />
+            <Divider color={'#D2D2D2'} width={1} />
           )}
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <View style={{flexDirection: 'row'}}>
+          <View className="flex-row justify-between">
+            <View className="flex-row">
               <Pressable onPress={() => _share()}>
                 <FontAwesomeIcon
                   icon={faShareAlt}
-                  color={colors.greyDark}
-                  style={{marginLeft: 15, marginVertical: 15}}
+                  color={'#A8A8A8'}
+                  className="ml-4 my-4"
                 />
               </Pressable>
               <Pressable
@@ -301,18 +235,18 @@ const SolvesModal = props => {
                 }}>
                 <FontAwesomeIcon
                   icon={faTrash}
-                  color={colors.greyDark}
-                  style={{marginLeft: 15, marginVertical: 15}}
+                  color={'#A8A8A8'}
+                  className="ml-4 my-4"
                 />
               </Pressable>
             </View>
-            <View style={{flexDirection: 'row'}}>
+            <View className="flex-row">
               <Pressable
                 onPress={() => dispatch(toggleEditCommentsVisibility())}>
                 <FontAwesomeIcon
                   icon={faCommentAlt}
-                  color={!isEditCommentsVisible ? colors.greyDark : colors.blue}
-                  style={{marginRight: 15, marginVertical: 15}}
+                  color={!isEditCommentsVisible ? '#A8A8A8' : colors.blue}
+                  className="mr-4 my-4"
                 />
               </Pressable>
               {penalty !== '' && (
@@ -330,8 +264,8 @@ const SolvesModal = props => {
                   }}>
                   <FontAwesomeIcon
                     icon={faUndo}
-                    color={colors.greyDark}
-                    style={{marginRight: 15, marginVertical: 15}}
+                    color={'#A8A8A8'}
+                    className="mr-4 my-4"
                   />
                 </Pressable>
               )}
@@ -342,8 +276,8 @@ const SolvesModal = props => {
                   }}>
                   <FontAwesomeIcon
                     icon={faBan}
-                    color={colors.greyDark}
-                    style={{marginRight: 15, marginVertical: 15}}
+                    color={'#A8A8A8'}
+                    className="mr-4 my-4"
                   />
                 </Pressable>
               )}
@@ -359,11 +293,8 @@ const SolvesModal = props => {
                   }}>
                   <FontAwesomeIcon
                     icon={faFlag}
-                    color={colors.greyDark}
-                    style={{
-                      marginRight: 15,
-                      marginVertical: 15,
-                    }}
+                    color={'#A8A8A8'}
+                    className="mr-4 my-4"
                   />
                 </Pressable>
               )}

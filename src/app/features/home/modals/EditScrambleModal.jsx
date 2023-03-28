@@ -1,14 +1,9 @@
-import Modal from 'react-native-modal';
 import React, {memo, useState} from 'react';
-import {Button} from 'react-native-elements';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {Pressable, View} from 'react-native';
-import {faBackspace} from '@fortawesome/free-solid-svg-icons';
 import {useDispatch, useSelector} from 'react-redux';
-import {Text} from '_components';
+import {Modal, Text} from '_components';
 import {constants} from '_data/constants';
 import {strings} from '_data/strings';
-import {colors} from '_features/theme';
 import {toggleEditScrambleModalVisibility} from '../redux/homeSlice';
 import {
   addToScrambleText,
@@ -16,7 +11,7 @@ import {
   removeFromScrambleText,
   toggleEditScrambleModalVisibilityFromModal,
 } from '../redux/editScrambleModalSlice';
-import styles from '../styles/editScrambleModalStyle';
+import {ScrollView} from 'react-native-gesture-handler';
 
 const EditScrambleModal = props => {
   const [innerComponents, setInnerComponents] = useState([]);
@@ -36,25 +31,24 @@ const EditScrambleModal = props => {
   const suffixes = constants.suffixes;
 
   const _innerComponentButton = (notation, suffix) => (
-    <Button
+    <Pressable
       key={suffix}
-      title={notation + suffix}
-      buttonStyle={styles.notationButton}
-      onPress={() => dispatch(addToScrambleText({notation, suffix}))}
-    />
+      className="h-10 w-10 m-3 rounded-md items-center justify-center bg-blue-600"
+      onPress={() => dispatch(addToScrambleText({notation, suffix}))}>
+      <Text>{notation + suffix}</Text>
+    </Pressable>
   );
 
   const _outerComponentButton = notation => (
-    <Button
+    <Pressable
       key={notation}
-      title={notation}
-      buttonStyle={styles.notationButton}
+      className="h-10 w-10 m-3 rounded-md items-center justify-center bg-blue-600"
       onPress={() => {
         const innerComponentsTemp = [];
 
         for (let j = 0; j < suffixes.length; j += 6) {
           innerComponentsTemp.push(
-            <View key={suffixes[j]} style={styles.row}>
+            <View key={suffixes[j]} className="flex-row">
               {suffixes.map(
                 (suffix, idx) =>
                   idx >= j &&
@@ -66,13 +60,14 @@ const EditScrambleModal = props => {
         }
 
         setInnerComponents(innerComponentsTemp);
-      }}
-    />
+      }}>
+      <Text className="text-lg">{notation}</Text>
+    </Pressable>
   );
 
   for (let i = 0; i < notations.length; i += 6) {
     outerComponents.push(
-      <View key={notations[i]} style={styles.row}>
+      <View key={notations[i]} className="flex-row">
         {notations.map(
           (notation, idx) =>
             idx >= i && idx < i + 6 && _outerComponentButton(notation),
@@ -83,63 +78,62 @@ const EditScrambleModal = props => {
 
   return (
     <Modal
-      onBackdropPress={() =>
-        dispatch(toggleEditScrambleModalVisibilityFromModal())
-      }
-      onBackButtonPress={() =>
-        dispatch(toggleEditScrambleModalVisibilityFromModal())
-      }
-      animationInTiming={100}
-      animationOutTiming={100}
-      onModalHide={() => {
+      onClose={() => dispatch(toggleEditScrambleModalVisibilityFromModal())}
+      onHide={() => {
         dispatch(toggleEditScrambleModalVisibility());
-        props.setScrambleText(scrambleText.join(' '));
+
+        if (scrambleText !== null && scrambleText.length > 0) {
+          props.setScrambleText(scrambleText.join(' '));
+        }
       }}
-      useNativeDriver={true}
-      useNativeDriverForBackdrop={true}
-      backdropTransitionOutTiming={0}
+      title={strings.customScramble}
       isVisible={isEditScrambleModalVisible}>
-      <View style={styles.modalContainer}>
-        <View style={styles.modalView}>
-          <Text style={styles.editScrambleLabel}>
-            {strings.enterCustomScramble}
-          </Text>
-          {scrambleText.length !== 0 && (
-            <View style={styles.backspaceView}>
-              <Text style={styles.scrambleText}>{scrambleText.join(' ')}</Text>
-              <Pressable
-                onPress={() => dispatch(removeFromScrambleText(scrambleText))}>
-                <FontAwesomeIcon
-                  icon={faBackspace}
-                  color={colors.darkgrey}
-                  size={25}
-                />
-              </Pressable>
-            </View>
-          )}
-          <View style={styles.notationView}>{innerComponents}</View>
-          <View style={styles.notationView}>{outerComponents}</View>
-          <View style={styles.buttonView}>
-            <Button
-              containerStyle={styles.clearButton}
-              type="clear"
-              title={strings.clear}
-              disabled={scrambleText.length === 0}
-              titleStyle={styles.clearButtonTitle}
-              onPress={() => {
-                dispatch(clearScrambleText());
-              }}
-            />
-            <Button
-              type="clear"
-              title={strings.done}
-              disabled={scrambleText.length === 0}
-              onPress={() => {
-                dispatch(toggleEditScrambleModalVisibilityFromModal());
-              }}
-            />
-          </View>
+      <ScrollView className="max-h-40" showsVerticalScrollIndicator={false}>
+        <View className="m-2 p-2 flex-row items-center justify-between">
+          <Text className="text-xl">{scrambleText.join(' ')}</Text>
         </View>
+      </ScrollView>
+      <View className="max-h-40 items-center justify-center">
+        {innerComponents}
+      </View>
+      <ScrollView className="max-h-80" showsVerticalScrollIndicator={false}>
+        <View className="items-center justify-center">{outerComponents}</View>
+      </ScrollView>
+      <View className="m-3 flex-row justify-between">
+        <Pressable
+          disabled={scrambleText.length === 0}
+          onPress={() => {
+            dispatch(clearScrambleText());
+          }}>
+          <Text
+            className={`text-lg ${
+              scrambleText.length === 0 ? 'text-gray-500' : 'text-red-500'
+            }`}>
+            {strings.clearAll}
+          </Text>
+        </Pressable>
+        <Pressable
+          disabled={scrambleText.length === 0}
+          onPress={() => dispatch(removeFromScrambleText(scrambleText))}>
+          <Text
+            className={`text-lg ${
+              scrambleText.length === 0 ? 'text-gray-500' : 'text-indigo-500'
+            }`}>
+            {strings.clear}
+          </Text>
+        </Pressable>
+        <Pressable
+          disabled={scrambleText.length === 0}
+          onPress={() => {
+            dispatch(toggleEditScrambleModalVisibilityFromModal());
+          }}>
+          <Text
+            className={`text-lg ${
+              scrambleText.length === 0 ? 'text-gray-500' : 'text-indigo-500'
+            }`}>
+            {strings.done}
+          </Text>
+        </Pressable>
       </View>
     </Modal>
   );

@@ -3,16 +3,9 @@ import moment from 'moment';
 import uuid from 'react-native-uuid';
 import {Animated, Pressable, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import {Text} from '_components';
-import {colors} from '_features/theme';
 import {constants} from '_data/constants';
 import {saveToLocalStorage} from '_libs';
-import {
-  addToSolves,
-  removeLatestSolve,
-  toggleUpdateSolvesStatus,
-} from '../redux/solvesScreenSlice';
-import {toggleUpdateStatsStatus} from '../redux/statsScreenSlice';
+import {addToSolves} from '../redux/solvesScreenSlice';
 import {
   setInspectionPenalty,
   setInspectionTime,
@@ -26,14 +19,13 @@ import {
   toggleResetTimerStatus,
   toggleTimerOnStatus,
 } from '../redux/stopwatchSlice';
-import styles from '../styles/stopwatchStyle';
 import {fontSizeAnimIn, fontSizeAnimOut} from '../../../utils/animations';
 import {
   getDigit,
   getTimeInMilliseconds,
   getTimeInString,
 } from '../utils/formatTime';
-import {loadFromLocalStorage} from '../../../libs';
+import {useHexColor} from '../../../hooks/useHexColor';
 
 const Stopwatch = () => {
   const fontSizeAnim = useRef(new Animated.Value(80)).current;
@@ -107,6 +99,7 @@ const Stopwatch = () => {
 
   const _pressableComponentWhenTimerOn = children => (
     <Pressable
+      className="flex-1 flex-row"
       onPress={() => {
         dispatch(toggleTimerOnStatus());
         fontSizeAnimOut(fontSizeAnim);
@@ -119,6 +112,7 @@ const Stopwatch = () => {
 
   const _pressableComponentWhenInspectionTimerOn = children => (
     <Pressable
+      className="flex-1 flex-row"
       onPressIn={() => {
         if (!isPressTimerOn) {
           dispatch(togglePressTimerOnStatus());
@@ -144,6 +138,7 @@ const Stopwatch = () => {
 
   const _pressableComponentWhenTimerOffAndInspectionEnabled = children => (
     <Pressable
+      className="flex-1 flex-row"
       onPress={() => {
         dispatch(setInspectionPenalty(''));
         dispatch(toggleInspectionTimerOnStatus());
@@ -154,6 +149,7 @@ const Stopwatch = () => {
 
   const _pressableComponentWhenTimerOffAndInspectionNotEnabled = children => (
     <Pressable
+      className="flex-1 flex-row"
       onPressIn={() => {
         if (!isPressTimerOn) {
           dispatch(togglePressTimerOnStatus());
@@ -204,12 +200,11 @@ const Stopwatch = () => {
           color:
             pressTime > 0 && !isStopwatchOn
               ? pressTime > 500
-                ? colors.green
-                : colors.red
-              : colors.white,
+                ? useHexColor('bg-green-500')
+                : useHexColor('bg-red-500')
+              : useHexColor('bg-neutral-50'),
           fontSize: fontSizeAnim,
         },
-        styles.timerDigit,
       ]}>
       {children}
     </Animated.Text>
@@ -218,19 +213,18 @@ const Stopwatch = () => {
   const _renderTimer = () => {
     if (inspectionPenalty === 'DNF') {
       return (
-        <View style={styles.timerInnerView}>
+        <View className="flex-1 flex-row items-center justify-center">
           <Animated.Text
             style={[
               {
                 color:
                   pressTime > 0 && !isStopwatchOn
                     ? pressTime > 500
-                      ? colors.green
-                      : colors.red
-                    : colors.white,
+                      ? useHexColor('bg-green-500')
+                      : useHexColor('bg-red-500')
+                    : useHexColor('bg-neutral-50'),
                 fontSize: fontSizeAnim,
               },
-              styles.timerDigit,
             ]}>
             DNF
           </Animated.Text>
@@ -259,23 +253,26 @@ const Stopwatch = () => {
       );
     }
 
-    return <View style={styles.timerInnerView}>{timeInString}</View>;
+    return (
+      <View className="flex-1 flex-row items-center justify-center">
+        {timeInString}
+      </View>
+    );
   };
 
   const _renderInspectionTimer = () => (
-    <View style={styles.timerInnerView}>
+    <View className="flex-1 flex-row items-center justify-center">
       <Animated.Text
         style={[
           {
             color:
               pressTime > 0
                 ? pressTime > 500
-                  ? colors.green
-                  : colors.red
-                : colors.white,
+                  ? useHexColor('bg-green-500')
+                  : useHexColor('bg-red-500')
+                : useHexColor('bg-neutral-50'),
             fontSize: fontSizeAnim,
           },
-          styles.timerDigit,
         ]}>
         {inspectionPenalty === '' ? inspectionTime : inspectionPenalty}
       </Animated.Text>
@@ -358,7 +355,7 @@ const Stopwatch = () => {
   }
 
   return (
-    <View style={styles.timerOuterView}>
+    <View className="flex-1 items-center justify-center">
       {_pressableComponent(
         timerSettings.isInspectionEnabled &&
           isInspectionTimerOn &&

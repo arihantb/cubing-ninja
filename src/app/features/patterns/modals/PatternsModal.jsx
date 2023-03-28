@@ -1,12 +1,10 @@
 import Modal from 'react-native-modal';
 import React, {memo} from 'react';
 import {Divider} from 'react-native-elements';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {ScrollView, Pressable, View} from 'react-native';
-import {faCheck, faEdit, faSyncAlt} from '@fortawesome/free-solid-svg-icons';
+import {faCheck} from '@fortawesome/free-solid-svg-icons';
 import {useDispatch, useSelector} from 'react-redux';
 import {PuzzlePlayer, Text} from '_components';
-import {colors} from '_features/theme';
 import {
   addToCompletedPatterns,
   removeFromCompletedPatterns,
@@ -16,7 +14,8 @@ import {
   setSelectedPatternIndex,
   togglePatternsModalVisibilityFromModal,
 } from '../redux/patternsModalSlice';
-import styles from '../styles/patternsModalStyle';
+import {useHexColor} from '../../../hooks/useHexColor';
+import {Icon} from '../../../components';
 
 const PatternsModal = props => {
   const completedPatterns = useSelector(
@@ -39,19 +38,13 @@ const PatternsModal = props => {
     selectedPattern.algorithms.map((algorithm, idx) => (
       <Pressable
         key={idx}
-        style={[
-          {
-            backgroundColor:
-              selectedPatternIndex === idx ? colors.primary : colors.secondary,
-          },
-          styles.patternView,
-        ]}
+        className={`p-3 ${
+          selectedPatternIndex === idx
+            ? 'bg-neutral-100 dark:bg-neutral-800'
+            : 'bg-neutral-200 dark:bg-neutral-700'
+        }`}
         onPress={() => dispatch(setSelectedPatternIndex(idx))}>
-        <Text
-          style={[
-            {color: selectedPatternIndex === idx && colors.blue},
-            styles.patternText,
-          ]}>
+        <Text className={selectedPatternIndex === idx && 'bg-indigo-500'}>
           {algorithm}
         </Text>
       </Pressable>
@@ -63,16 +56,16 @@ const PatternsModal = props => {
       onBackButtonPress={() =>
         dispatch(togglePatternsModalVisibilityFromModal())
       }
-      useNativeDriver={true}
-      useNativeDriverForBackdrop={true}
+      useNativeDriver
+      useNativeDriverForBackdrop
       onModalHide={() => dispatch(togglePatternsModalVisibility())}
       backdropTransitionOutTiming={0}
       isVisible={isPatternsModalVisible}>
-      <View style={styles.backdrop}>
-        <View style={styles.mainContainer}>
-          <Text style={styles.patternNameText}>{selectedPattern.name}</Text>
-          <Divider colors={colors.grey} />
-          <View style={styles.puzzlePlayerView}>
+      <View className="flex-1 items-center justify-center">
+        <View className="w-3/4 rounded-md">
+          <Text className="m-3 text-center">{selectedPattern.name}</Text>
+          <Divider colors={useHexColor('bg-neutral-50')} />
+          <View className="h-80">
             <PuzzlePlayer
               puzzle={puzzle}
               alg={selectedPattern.algorithms[selectedPatternIndex]}
@@ -86,8 +79,8 @@ const PatternsModal = props => {
             showsVerticalScrollIndicator={false}>
             {_renderPatterns()}
           </ScrollView>
-          <Divider color={colors.grey} />
-          <View style={styles.bottomIconsView}>
+          <Divider color={useHexColor('bg-neutral-50')} />
+          <View className="flex-row mx-5 my-3 justify-end">
             <Pressable
               onPress={() =>
                 completedPatterns[props.puzzle].includes(selectedPattern.id)
@@ -104,12 +97,12 @@ const PatternsModal = props => {
                       }),
                     )
               }>
-              <FontAwesomeIcon
+              <Icon
                 icon={faCheck}
                 color={
                   completedPatterns[props.puzzle].includes(selectedPattern.id)
-                    ? colors.green
-                    : colors.gray
+                    ? 'bg-green-500'
+                    : 'bg-neutral-400'
                 }
               />
             </Pressable>

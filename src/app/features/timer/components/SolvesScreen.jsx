@@ -1,27 +1,22 @@
 import React, {memo, useEffect} from 'react';
 import {FlatGrid} from 'react-native-super-grid';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {Pressable, View} from 'react-native';
 import {faStickyNote} from '@fortawesome/free-solid-svg-icons';
 import {useDispatch, useSelector} from 'react-redux';
-import {Card, ImageMessage, Text} from '_components';
+import {Card, Icon, ImageMessage, Text} from '_components';
 import {strings} from '_data/strings';
-import {colors} from '_features/theme';
 import {loadFromLocalStorage, saveToLocalStorage} from '_libs';
 import SolvesModal from '../modals/SolvesModal';
 import {toggleDeleteHeaderIconVisibility} from '_features/home/redux/homeSlice';
 import {
-  setSelectedSolves,
   updateSelectedSolves,
   setSolveData,
   setSolves,
   setSearchSolves,
-  toggleDeleteSolvesStatus,
   toggleSolvesModalVisibility,
   toggleSolvesSelectionMode,
   toggleSolvesSortedStatus,
 } from '../redux/solvesScreenSlice';
-import styles from '../styles/solvesScreenStyle';
 
 const SolvesScreen = () => {
   const areSolvesSorted = useSelector(
@@ -41,9 +36,6 @@ const SolvesScreen = () => {
   const searchSolves = useSelector(state => state.solvesScreen.searchSolves);
   const selectedSolves = useSelector(
     state => state.solvesScreen.selectedSolves,
-  );
-  const shouldDeleteSolves = useSelector(
-    state => state.solvesScreen.shouldDeleteSolves,
   );
   const solves = useSelector(state => state.solvesScreen.solves);
 
@@ -132,29 +124,27 @@ const SolvesScreen = () => {
         onLongPress={() => dispatch(updateSelectedSolves(item.id))}>
         <Card
           title={item.penalty === 'DNF' ? 'DNF' : item.penalizedTime}
-          titleStyle={styles.cardTitle}
-          cardStyle={[
-            {
-              backgroundColor:
-                selectedSolves.indexOf(item.id) === -1
-                  ? colors.primaryLight
-                  : colors.primaryDark,
-            },
-            styles.card,
-          ]}
+          titleStyle="text-sm"
+          cardStyle={`items-center w-20 ${
+            selectedSolves.indexOf(item.id) === -1
+              ? 'bg-neutral-300 dark:bg-neutral-800'
+              : 'bg-neutral-400 dark:bg-neutral-700'
+          }`}
         />
-        <Text style={styles.date}>
+        <Text className="absolute left-1 top-1">
           {new Date(item.date).getDate() +
             '/' +
             (new Date(item.date).getMonth() + 1)}
         </Text>
-        {item.penalty === '+2' && <Text style={styles.plus2}>+2</Text>}
+        {item.penalty === '+2' && (
+          <Text className="absolute right-1 top-1">+2</Text>
+        )}
         {item.comments !== '' && (
-          <FontAwesomeIcon
+          <Icon
             icon={faStickyNote}
-            color={colors.white}
+            color="bg-neutral-50"
             size={10}
-            style={styles.commentsIcon}
+            className="absolute left-1 bottom-1"
           />
         )}
       </Pressable>
@@ -162,7 +152,7 @@ const SolvesScreen = () => {
   };
 
   return (
-    <View style={styles.mainContainer}>
+    <View className="flex-1 bg-neutral-50 dark:bg-neutral-900">
       {isSolvesModalVisible && <SolvesModal deleteSolve={_deleteSolve} />}
       {solves.length === 0 ? (
         searchText !== '' ? (
@@ -179,9 +169,9 @@ const SolvesScreen = () => {
             offset: 100 * index,
             index,
           })}
-          itemContainerStyle={styles.itemContainer}
+          itemContainerStyle={{alignItems: 'center'}}
           itemDimension={100}
-          removeClippedSubviews={true}
+          removeClippedSubviews
           renderItem={_renderItem}
           showsVerticalScrollIndicator={false}
         />

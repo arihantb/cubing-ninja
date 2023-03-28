@@ -6,12 +6,10 @@ import {View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {Pressable, Text} from '_components';
 import {strings} from '_data/strings';
-import {colors} from '_features/theme';
 import {
   setLanguage,
   toggleLanguageModalVisibility,
 } from '../redux/settingsSlice';
-import styles from '../styles/alertTypeModalStyle';
 
 const LanguageModal = () => {
   const [visible, setVisible] = useState(true);
@@ -49,19 +47,14 @@ const LanguageModal = () => {
       }}>
       <View
         style={{
-          backgroundColor:
-            language === item.code ? colors.secondary : colors.lightgrey,
+          backgroundColor: language === item.code ? '#00FF00' : '#FF00FF',
           padding: 10,
           borderRadius: 10,
           justifyContent: 'center',
           alignItems: 'center',
         }}>
         <Flag code={item.code} size={32} type="flat" />
-        <Text
-          style={[
-            {color: language === item.code ? colors.white : colors.black},
-            styles.puzzleLabel,
-          ]}>
+        <Text style={[{color: language === item.code ? '#FFFFFF' : '#000000'}]}>
           {item.language}
         </Text>
       </View>
@@ -72,17 +65,17 @@ const LanguageModal = () => {
     <Modal
       onBackdropPress={() => setVisible(false)}
       onBackButtonPress={() => setVisible(false)}
-      useNativeDriver={true}
-      useNativeDriverForBackdrop={true}
+      useNativeDriver
+      useNativeDriverForBackdrop
       onModalHide={() => dispatch(toggleLanguageModalVisibility())}
       backdropTransitionOutTiming={0}
       isVisible={visible}>
-      <View style={styles.modalContainer}>
-        <View style={styles.modalView}>
-          <Text style={styles.selectPuzzleLabel}>{strings.selectLanguage}</Text>
+      <View>
+        <View>
+          <Text>{strings.selectLanguage}</Text>
           <FlatGrid
             itemDimension={70}
-            centerContent={true}
+            centerContent
             style={{
               width: 250,
               flexGrow: 0,
@@ -90,7 +83,7 @@ const LanguageModal = () => {
             itemContainerStyle={{alignItems: 'center'}}
             data={data}
             renderItem={renderItem}
-            removeClippedSubviews={true}
+            removeClippedSubviews
             showsVerticalScrollIndicator={false}
           />
         </View>

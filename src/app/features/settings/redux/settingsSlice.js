@@ -1,6 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 const initialState = {
+  isStatusBarVisible: true,
   isAlgorithmsSettingsVisible: false,
   isGeneralSettingsVisible: false,
   isLanguageModalVisible: false,
@@ -13,6 +14,9 @@ export const settingsSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
+    toggleStatusBarVisibility: state => {
+      state.isStatusBarVisible = !state.isStatusBarVisible;
+    },
     toggleAlgorithmsSettingsVisibility: state => {
       state.isAlgorithmsSettingsVisible = !state.isAlgorithmsSettingsVisible;
     },
@@ -35,6 +39,7 @@ export const settingsSlice = createSlice({
 });
 
 export const {
+  toggleStatusBarVisibility,
   toggleAlgorithmsSettingsVisibility,
   toggleGeneralSettingsVisibility,
   toggleLanguageModalVisibility,

@@ -5,13 +5,12 @@ import {Divider} from 'react-native-elements';
 import {Image, Pressable, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {Text} from '_components';
-import {colors} from '_features/theme';
 import {
   setAlertType,
   toggleAlertTypeModalVisibility,
 } from '../redux/settingsSlice';
-import styles from '../styles/alertTypeModalStyle';
 import {sound, soundVibrate, vibrate} from '../../../assets/images';
+import {useHexColor} from '../../../hooks/useHexColor';
 
 const AlertTypeModal = props => {
   const [visible, setVisible] = useState(true);
@@ -29,103 +28,84 @@ const AlertTypeModal = props => {
       animationOut="fadeOut"
       animationInTiming={100}
       animationOutTiming={100}
-      useNativeDriver={true}
-      useNativeDriverForBackdrop={true}
+      useNativeDriver
+      useNativeDriverForBackdrop
       onModalHide={() => {
         dispatch(toggleAlertTypeModalVisibility());
         dispatch(setAlertType(alertType));
       }}
       backdropTransitionOutTiming={0}
       isVisible={visible}
-      style={{margin: 0}}>
-      <View style={[{bottom: props.offset + 310}, styles.modalContainer]}>
+      className="m-0">
+      <View style={[{bottom: props.offset + 310}]}>
         <Pressable
-          style={{
-            backgroundColor: alertType === 'Sound' ? colors.blue : colors.white,
-            width: 150,
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}
+          className={`w-36 flex-row items-center ${
+            alertType === 'Sound' ? 'bg-indigo-500' : 'bg-neutral-50'
+          }`}
           onPress={() => {
             dispatch(setAlertType('Sound'));
             setVisible(false);
           }}>
           <Image
             source={{uri: sound}}
+            className="h-5 w-5 m-3"
             style={{
-              margin: 10,
-              width: 20,
-              height: 20,
-              tintColor: alertType === 'Sound' ? colors.white : colors.black,
+              tintColor: alertType === 'Sound' ? '#FFFFFF' : '#000000',
             }}
           />
           <Text
             style={{
-              color: alertType === 'Sound' ? colors.white : colors.black,
-              fontSize: 18,
+              color: alertType === 'Sound' ? '#FFFFFF' : '#000000',
             }}>
             Sound
           </Text>
         </Pressable>
         {alertType !== 'Sound' && alertType !== 'Vibrate' && (
-          <Divider color={colors.lightgrey} width={1} />
+          <Divider color={useHexColor('bg-neutral-500')} width={1} />
         )}
         <Pressable
-          style={{
-            backgroundColor:
-              alertType === 'Vibrate' ? colors.blue : colors.white,
-            width: 150,
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}
+          className={`w-36 flex-row items-center ${
+            alertType === 'Sound' ? 'bg-indigo-500' : 'bg-neutral-50'
+          }`}
           onPress={() => {
             dispatch(setAlertType('Vibrate'));
             setVisible(false);
           }}>
           <Image
             source={{uri: vibrate}}
+            className="h-5 w-5 m-3"
             style={{
-              margin: 10,
-              width: 20,
-              height: 20,
-              tintColor: alertType === 'Vibrate' ? colors.white : colors.black,
+              tintColor: alertType === 'Vibrate' ? '#FFFFFF' : '#000000',
             }}
           />
           <Text
             style={{
-              color: alertType === 'Vibrate' ? colors.white : colors.black,
-              fontSize: 18,
+              color: alertType === 'Vibrate' ? '#FFFFFF' : '#000000',
             }}>
             Vibrate
           </Text>
         </Pressable>
         {alertType !== 'Vibrate' && alertType !== 'Both' && (
-          <Divider color={colors.lightgrey} width={1} />
+          <Divider color={useHexColor('bg-neutral-500')} width={1} />
         )}
         <Pressable
-          style={{
-            backgroundColor: alertType === 'Both' ? colors.blue : colors.white,
-            width: 150,
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}
+          className={`w-36 flex-row items-center ${
+            alertType === 'Sound' ? 'bg-indigo-500' : 'bg-neutral-50'
+          }`}
           onPress={() => {
             dispatch(setAlertType('Both'));
             setVisible(false);
           }}>
           <Image
             source={{uri: soundVibrate}}
+            className="h-5 w-5 m-3"
             style={{
-              margin: 10,
-              width: 20,
-              height: 20,
-              tintColor: alertType === 'Both' ? colors.white : colors.black,
+              tintColor: alertType === 'Both' ? '#FFFFFF' : '#000000',
             }}
           />
           <Text
             style={{
-              color: alertType === 'Both' ? colors.white : colors.black,
-              fontSize: 18,
+              color: alertType === 'Both' ? '#FFFFFF' : '#000000',
             }}>
             Both
           </Text>

@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React, {memo, useEffect, useRef} from 'react';
 import {Animated, Pressable, View} from 'react-native';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {
@@ -10,7 +9,6 @@ import {
   faChartLine,
 } from '@fortawesome/free-solid-svg-icons';
 import {useDispatch, useSelector} from 'react-redux';
-import {colors} from '_features/theme';
 import {useDoubleBackTapToExit} from '_hooks/useDoubleBackTapToExit';
 import TimerScreen from './components/TimerScreen';
 import SolvesScreen from './components/SolvesScreen';
@@ -19,8 +17,8 @@ import {
   setTimerScreenHeaderIconIndex,
   toggleSearchBarVisibility,
 } from '../home/redux/homeSlice';
-import styles from './styles/timerStyle';
 import {heightAnimIn, heightAnimOut} from '../../utils/animations';
+import {Icon} from '../../components';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -40,8 +38,8 @@ const Timer = () => {
 
   const timerTab = props => (
     <Animated.View
+      className="bg-neutral-50 dark:bg-neutral-800"
       style={[
-        styles.timerTabAnimatedView,
         {
           transform: [
             {
@@ -53,15 +51,11 @@ const Timer = () => {
           ],
         },
       ]}>
-      <View style={styles.timerTabIconsView}>
+      <View className="flex-row">
         <Pressable
-          style={[
-            {
-              borderColor:
-                props.state.index === 0 ? colors.blue : colors.primary,
-            },
-            styles.timerIconView,
-          ]}
+          className={`flex-1 p-4 items-center justify-center border-t-2 ${
+            props.state.index === 0 ? 'border-indigo-500' : 'border-transparent'
+          }`}
           onPress={() => {
             if (isSearchBarVisible) {
               dispatch(toggleSearchBarVisibility());
@@ -70,38 +64,38 @@ const Timer = () => {
             dispatch(setTimerScreenHeaderIconIndex(0));
             props.navigation.navigate('timerScreen');
           }}>
-          <FontAwesomeIcon
+          <Icon
             icon={faStopwatch}
-            color={props.state.index === 0 ? colors.blue : colors.white}
+            color={
+              props.state.index === 0
+                ? 'bg-indigo-500'
+                : 'bg-neutral-900 dark:bg-neutral-50'
+            }
             size={20}
           />
         </Pressable>
         <Pressable
-          style={[
-            {
-              borderColor:
-                props.state.index === 1 ? colors.blue : colors.primary,
-            },
-            styles.solvesIconView,
-          ]}
+          className={`flex-1 p-4 items-center justify-center border-t-2 ${
+            props.state.index === 1 ? 'border-indigo-500' : 'border-transparent'
+          }`}
           onPress={() => {
             dispatch(setTimerScreenHeaderIconIndex(1));
             props.navigation.navigate('solvesScreen');
           }}>
-          <FontAwesomeIcon
+          <Icon
             icon={faListAlt}
-            color={props.state.index === 1 ? colors.blue : colors.white}
+            color={
+              props.state.index === 1
+                ? 'bg-indigo-500'
+                : 'bg-neutral-900 dark:bg-neutral-50'
+            }
             size={20}
           />
         </Pressable>
         <Pressable
-          style={[
-            {
-              borderColor:
-                props.state.index === 2 ? colors.blue : colors.primary,
-            },
-            styles.statsIconView,
-          ]}
+          className={`flex-1 p-4 items-center justify-center border-t-2 ${
+            props.state.index === 2 ? 'border-indigo-500' : 'border-transparent'
+          }`}
           onPress={() => {
             if (isSearchBarVisible) {
               dispatch(toggleSearchBarVisibility());
@@ -110,9 +104,13 @@ const Timer = () => {
             dispatch(setTimerScreenHeaderIconIndex(2));
             props.navigation.navigate('statsScreen');
           }}>
-          <FontAwesomeIcon
+          <Icon
             icon={faChartLine}
-            color={props.state.index === 2 ? colors.blue : colors.white}
+            color={
+              props.state.index === 2
+                ? 'bg-indigo-500'
+                : 'bg-neutral-900 dark:bg-neutral-50'
+            }
             size={20}
           />
         </Pressable>

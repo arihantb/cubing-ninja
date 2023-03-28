@@ -5,8 +5,8 @@ import {FlatGrid, SectionGrid} from 'react-native-super-grid';
 import {useSelector, useDispatch} from 'react-redux';
 
 import {Text} from '_components';
-import {colors} from '_features/theme';
 import {loadFromLocalStorage, saveToLocalStorage} from '_libs';
+import {useHexColor} from '../../../hooks/useHexColor';
 import PatternsModal from '../modals/PatternsModal';
 import {
   addToCompletedPatterns,
@@ -17,7 +17,6 @@ import {
   togglePatternsModalVisibility,
 } from '../redux/patternsGridSlice';
 import {togglePatternsModalVisibilityFromModal} from '../redux/patternsModalSlice';
-import styles from '../styles/patternsGridStyle';
 
 const PatternsGrid = props => {
   const patternsData = useSelector(state => state.patternsGrid.patternsData);
@@ -50,7 +49,7 @@ const PatternsGrid = props => {
     };
 
     loadDataFromStorage();
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     const saveCompletedPatterns = async () => {
@@ -100,34 +99,33 @@ const PatternsGrid = props => {
             );
       }}>
       <View
-        style={[
-          {
-            backgroundColor: completedPatterns[props.puzzle].includes(index)
-              ? colors.green
-              : colors.primary,
-          },
-          styles.itemView,
-        ]}>
-        <Text style={styles.itemText}>
+        className={`rounded-md ${
+          completedPatterns[props.puzzle].includes(index)
+            ? 'bg-green-500'
+            : 'bg-neutral-100 dark:bg-neutral-800'
+        }`}>
+        <Text className="m-3 text-center">
           {item.name.length > 12
             ? item.name.slice(0, 12) + '...'
             : item.name.length}
         </Text>
-        <Divider color={colors.white} />
+        <Divider color={useHexColor('bg-neutral-50')} />
         <Image
           source={{
             uri: `http://cube.rider.biz/visualcube.php?fmt=png&size=150&pzl=${
               puzzle + 2
             }&alg=${item.algorithms[0]}&bg=t`,
           }}
-          style={styles.image}
+          className="h-24 w-24 m-3"
         />
       </View>
     </Pressable>
   );
 
   const _renderSectionHeader = ({section}) => (
-    <Text style={styles.sectionTitle}>{section.title}</Text>
+    <Text className="flex-1 p-3 bg-neutral-50 dark:bg-neutral-900">
+      {section.title}
+    </Text>
   );
 
   const _getSections = sections => {
@@ -152,10 +150,10 @@ const PatternsGrid = props => {
   };
 
   const _downloadInfo = () => (
-    <View style={styles.downloadView}>
+    <View className="flex-1 items-center justify-center">
       <Button title="Download" onPress={_download} />
-      <View style={styles.downloadInfoView}>
-        <Text style={styles.downloadInfoText}>{props.downloadInfo}</Text>
+      <View className="m-5 flex-row flex-wrap justify-center">
+        <Text>{props.downloadInfo}</Text>
       </View>
     </View>
   );
@@ -163,11 +161,11 @@ const PatternsGrid = props => {
   const _flatGrid = () => (
     <FlatGrid
       itemDimension={100}
-      itemContainerStyle={styles.itemContainer}
-      stickySectionHeadersEnabled={true}
+      itemContainerStyle={{alignItems: 'center'}}
+      stickySectionHeadersEnabled
       data={patternsData[props.puzzle].patterns}
       renderItem={_renderItem}
-      removeClippedSubviews={true}
+      removeClippedSubviews
       getItemLayout={(_, index) => ({
         length: 100,
         offset: 100 * index,
@@ -180,13 +178,13 @@ const PatternsGrid = props => {
   const _sectionGrid = () => (
     <SectionGrid
       itemDimension={100}
-      itemContainerStyle={styles.itemContainer}
-      stickySectionHeadersEnabled={true}
+      itemContainerStyle={{alignItems: 'center'}}
+      stickySectionHeadersEnabled
       sections={_getSections(patternsData[props.puzzle].sections)}
       data={patternsData[props.puzzle].patterns}
       renderItem={_renderItem}
       renderSectionHeader={_renderSectionHeader}
-      removeClippedSubviews={true}
+      removeClippedSubviews
       getItemLayout={(_, index) => ({
         length: 100,
         offset: 100 * index,
@@ -197,7 +195,7 @@ const PatternsGrid = props => {
   );
 
   return (
-    <View style={styles.mainContainer}>
+    <View className="flex-1 bg-neutral-50 dark:bg-neutral-900">
       {isPatternsModalVisible && <PatternsModal puzzle={props.puzzle} />}
       {patternsData[props.puzzle].patterns.length === 0
         ? _downloadInfo()

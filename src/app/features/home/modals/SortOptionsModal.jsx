@@ -1,15 +1,12 @@
 import Modal from 'react-native-modal';
 import React, {memo} from 'react';
-import {Divider} from 'react-native-elements';
 import {Pressable, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {Text} from '_components';
 import {strings} from '_data/strings';
-import {colors} from '_features/theme';
 import {setSolvesSortOption} from '../../timer/redux/solvesScreenSlice';
 import {toggleSortOptionsModalVisibility} from '../redux/homeSlice';
 import {toggleSortOptionsModalVisibilityFromModal} from '../redux/sortOptionsModalSlice';
-import styles from '../styles/sortOptionsModalStyle';
 
 const SortOptionsModal = () => {
   const isSortOptionsModalVisible = useSelector(
@@ -34,13 +31,11 @@ const SortOptionsModal = () => {
       animationOut="fadeOut"
       animationInTiming={100}
       animationOutTiming={100}
-      useNativeDriver={true}
-      useNativeDriverForBackdrop={true}
       onModalHide={() => dispatch(toggleSortOptionsModalVisibility())}
       backdropTransitionOutTiming={0}
       isVisible={isSortOptionsModalVisible}
-      style={styles.modal}>
-      <View style={styles.mainContainer}>
+      className="m-0">
+      <View className="absolute top-12 right-12">
         <Pressable
           onPress={() => {
             dispatch(
@@ -57,26 +52,20 @@ const SortOptionsModal = () => {
             dispatch(toggleSortOptionsModalVisibilityFromModal());
           }}>
           <Text
-            style={[
-              {
-                backgroundColor:
-                  solvesSortOption.sortBy === 'Date'
-                    ? colors.blue
-                    : colors.white,
-                color:
-                  solvesSortOption.sortBy === 'Date'
-                    ? colors.white
-                    : colors.black,
-              },
-              styles.sortOptionText,
-            ]}>
+            className={`p-2 text-lg text-center ${
+              solvesSortOption.sortBy === 'Date'
+                ? 'text-white'
+                : 'text-slate-900'
+            }
+            
+              ${
+                solvesSortOption.sortBy === 'Date'
+                  ? 'bg-indigo-500'
+                  : 'bg-white'
+              }`}>
             {strings.date}
           </Text>
         </Pressable>
-        {solvesSortOption.sortBy !== 'Date' &&
-          solvesSortOption.sortBy !== 'Solve Time' && (
-            <Divider color={colors.lightgrey} width={1} />
-          )}
         <Pressable
           onPress={() => {
             dispatch(
@@ -93,19 +82,17 @@ const SortOptionsModal = () => {
             dispatch(toggleSortOptionsModalVisibilityFromModal());
           }}>
           <Text
-            style={[
-              {
-                backgroundColor:
-                  solvesSortOption.sortBy === 'Solve Time'
-                    ? colors.blue
-                    : colors.white,
-                color:
-                  solvesSortOption.sortBy === 'Solve Time'
-                    ? colors.white
-                    : colors.black,
-              },
-              styles.sortOptionText,
-            ]}>
+            className={`p-2 text-lg text-center ${
+              solvesSortOption.sortBy === 'Solve Time'
+                ? 'text-white'
+                : 'text-slate-900'
+            }
+            
+              ${
+                solvesSortOption.sortBy === 'Solve Time'
+                  ? 'bg-indigo-500'
+                  : 'bg-white'
+              }`}>
             {strings.solveTime}
           </Text>
         </Pressable>

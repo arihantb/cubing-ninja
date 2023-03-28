@@ -1,8 +1,6 @@
 import PropTypes from 'prop-types';
 import React, {memo, useEffect} from 'react';
-import {Avatar, Divider} from 'react-native-elements';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {Pressable, View} from 'react-native';
+import {Avatar, Divider, Pressable, View} from 'react-native';
 import {
   faStopwatch,
   faBrain,
@@ -14,8 +12,7 @@ import {
   faPalette,
 } from '@fortawesome/free-solid-svg-icons';
 import {useDispatch, useSelector} from 'react-redux';
-import {Text} from '_components';
-import {colors} from '_features/theme';
+import {Icon, Text} from '_components';
 import {strings} from '_data/strings';
 import {setDrawerItemIndex} from '_features/home/redux/homeSlice';
 import {
@@ -27,7 +24,6 @@ import {
 } from './redux/navigationDrawerSlice';
 import EditProfile from './modals/EditProfile';
 import SignInSignUp from './modals/SignInSignUp';
-import styles from './styles/navigationDrawerStyle';
 import {toggleSignInSignUpVisibilityFromModal} from './redux/signInSignUpSlice';
 import {
   setEmailFromModal,
@@ -63,15 +59,15 @@ const NavigationDrawer = ({props}) => {
         dispatch(setUsernameFromModal(userData.username));
       }
     });
-  }, [dispatch, isLoggedIn]);
+  }, [isLoggedIn]);
 
   return (
-    <View style={styles.drawerView}>
+    <View className="flex-1 bg-neutral-50 dark:bg-neutral-900">
       {isSignInSignUpVisible && <SignInSignUp />}
       {isEditProfileVisible && <EditProfile />}
-      <View style={styles.drawerHeaderView}>
+      <View className="p-8 bg-neutral-50 dark:bg-neutral-800 shadow-xl shadow-neutral-900 dark:shadow-none">
         <Pressable
-          style={styles.row}
+          className="flex-row gap-4 items-center"
           onPress={() => {
             if (isLoggedIn) {
               dispatch(toggleEditProfileVisibility());
@@ -82,125 +78,202 @@ const NavigationDrawer = ({props}) => {
             }
           }}>
           <Avatar
-            size="large"
+            size="lg"
             source={{uri: isLoggedIn ? profile : constants.placeholderUser}}
-            overlayContainerStyle={styles.avatarBackground}
-            containerStyle={styles.avatar}
           />
-          <Text style={styles.profileName}>
+          <Text className="text-2xl">
             {isLoggedIn ? username : strings.signIn}
           </Text>
         </Pressable>
       </View>
       <Pressable
-        style={
+        className={`p-4 ${
           drawerItemIndex === 0
-            ? styles.drawerItemSelected
-            : styles.drawerItemUnselected
-        }
+            ? 'bg-indigo-500'
+            : 'bg-neutral-50 dark:bg-neutral-900'
+        }`}
         onPress={() => {
           dispatch(setDrawerItemIndex(0));
           props.navigation.navigate('timer');
         }}>
-        <FontAwesomeIcon icon={faStopwatch} color={colors.white} size={20} />
-        <Text style={styles.drawerItemText}>{strings.timer}</Text>
+        <View className="flex-row gap-4">
+          <Icon
+            icon={faStopwatch}
+            color={
+              drawerItemIndex === 0
+                ? 'dark:bg-neutral-50'
+                : 'bg-neutral-900 dark:bg-neutral-50'
+            }
+            size={20}
+          />
+          <Text className="text-xl">{strings.timer}</Text>
+        </View>
       </Pressable>
       <Pressable
-        style={
+        className={`p-4 ${
           drawerItemIndex === 1
-            ? styles.drawerItemSelected
-            : styles.drawerItemUnselected
-        }
+            ? 'bg-indigo-500'
+            : 'bg-neutral-50 dark:bg-neutral-900'
+        }`}
         onPress={() => {
           dispatch(setDrawerItemIndex(1));
           props.navigation.navigate('trainer');
         }}>
-        <FontAwesomeIcon icon={faBrain} color={colors.white} size={20} />
-        <Text style={styles.drawerItemText}>{strings.trainer}</Text>
+        <View className="flex-row gap-4">
+          <Icon
+            icon={faBrain}
+            color={
+              drawerItemIndex === 1
+                ? 'dark:bg-neutral-50'
+                : 'bg-neutral-900 dark:bg-neutral-50'
+            }
+            size={20}
+          />
+          <Text className="text-xl">{strings.trainer}</Text>
+        </View>
       </Pressable>
       <Pressable
-        style={
+        className={`p-4 ${
           drawerItemIndex === 2
-            ? styles.drawerItemSelected
-            : styles.drawerItemUnselected
-        }
+            ? 'bg-indigo-500'
+            : 'bg-neutral-50 dark:bg-neutral-900'
+        }`}
         onPress={() => {
           dispatch(setDrawerItemIndex(2));
           props.navigation.navigate('algorithms');
         }}>
-        <FontAwesomeIcon icon={faShapes} color={colors.white} size={20} />
-        <Text style={styles.drawerItemText}>{strings.algorithms}</Text>
+        <View className="flex-row gap-4">
+          <Icon
+            icon={faShapes}
+            color={
+              drawerItemIndex === 2
+                ? 'dark:bg-neutral-50'
+                : 'bg-neutral-900 dark:bg-neutral-50'
+            }
+            size={20}
+          />
+          <Text className="text-xl">{strings.algorithms}</Text>
+        </View>
       </Pressable>
       <Pressable
-        style={
+        className={`p-4 ${
           drawerItemIndex === 3
-            ? styles.drawerItemSelected
-            : styles.drawerItemUnselected
-        }
+            ? 'bg-indigo-500'
+            : 'bg-neutral-50 dark:bg-neutral-900'
+        }`}
         onPress={() => {
           dispatch(setDrawerItemIndex(3));
           props.navigation.navigate('patterns');
         }}>
-        <FontAwesomeIcon icon={faPalette} color={colors.white} size={20} />
-        <Text style={styles.drawerItemText}>{strings.patterns}</Text>
+        <View className="flex-row gap-4">
+          <Icon
+            icon={faPalette}
+            color={
+              drawerItemIndex === 3
+                ? 'dark:bg-neutral-50'
+                : 'bg-neutral-900 dark:bg-neutral-50'
+            }
+            size={20}
+          />
+          <Text className="text-xl">{strings.patterns}</Text>
+        </View>
       </Pressable>
-      <Divider orientation="horizontal" width={1} color={colors.secondary} />
+      <Divider orientation="horizontal" backgroundColor={'#FFFF00'} />
       <Pressable
-        style={
+        className={`p-4 ${
           drawerItemIndex === 4
-            ? styles.drawerItemSelected
-            : styles.drawerItemUnselected
-        }
+            ? 'bg-indigo-500'
+            : 'bg-neutral-50 dark:bg-neutral-900'
+        }`}
         onPress={() => {
           dispatch(setDrawerItemIndex(4));
           props.navigation.navigate('theme');
         }}>
-        <FontAwesomeIcon icon={faFolder} color={colors.white} size={20} />
-        <Text style={styles.drawerItemText}>{strings.theme}</Text>
+        <View className="flex-row gap-4">
+          <Icon
+            icon={faFolder}
+            color={
+              drawerItemIndex === 4
+                ? 'dark:bg-neutral-50'
+                : 'bg-neutral-900 dark:bg-neutral-50'
+            }
+            size={20}
+          />
+          <Text
+            className={`text-xl ${drawerItemIndex === 4 && 'text-neutral-50'}`}>
+            {strings.theme}
+          </Text>
+        </View>
       </Pressable>
       <Pressable
-        style={
+        className={`p-4 ${
           drawerItemIndex === 5
-            ? styles.drawerItemSelected
-            : styles.drawerItemUnselected
-        }
+            ? 'bg-indigo-500'
+            : 'bg-neutral-50 dark:bg-neutral-900'
+        }`}
         onPress={() => {
           dispatch(setDrawerItemIndex(5));
           props.navigation.navigate('settings');
         }}>
-        <FontAwesomeIcon icon={faCog} color={colors.white} size={20} />
-        <Text style={styles.drawerItemText}>{strings.settings}</Text>
+        <View className="flex-row gap-4">
+          <Icon
+            icon={faCog}
+            color={
+              drawerItemIndex === 5
+                ? 'dark:bg-neutral-50'
+                : 'bg-neutral-900 dark:bg-neutral-50'
+            }
+            size={20}
+          />
+          <Text className="text-xl">{strings.settings}</Text>
+        </View>
       </Pressable>
-      <Divider orientation="horizontal" width={1} color={colors.secondary} />
+      <Divider orientation="horizontal" backgroundColor={'#FF00FF'} />
       <Pressable
-        style={
+        className={`p-4 ${
           drawerItemIndex === 6
-            ? styles.drawerItemSelected
-            : styles.drawerItemUnselected
-        }
+            ? 'bg-indigo-500'
+            : 'bg-neutral-50 dark:bg-neutral-900'
+        }`}
         onPress={() => {
           dispatch(setDrawerItemIndex(6));
           props.navigation.navigate('donate');
         }}>
-        <FontAwesomeIcon icon={faDonate} color={colors.white} size={20} />
-        <Text style={styles.drawerItemText}>{strings.donate}</Text>
+        <View className="flex-row gap-4">
+          <Icon
+            icon={faDonate}
+            color={
+              drawerItemIndex === 6
+                ? 'dark:bg-neutral-50'
+                : 'bg-neutral-900 dark:bg-neutral-50'
+            }
+            size={20}
+          />
+          <Text className="text-xl">{strings.donate}</Text>
+        </View>
       </Pressable>
       <Pressable
-        style={
+        className={`p-4 ${
           drawerItemIndex === 7
-            ? styles.drawerItemSelected
-            : styles.drawerItemUnselected
-        }
+            ? 'bg-indigo-500'
+            : 'bg-neutral-50 dark:bg-neutral-900'
+        }`}
         onPress={() => {
           dispatch(setDrawerItemIndex(7));
           props.navigation.navigate('about');
         }}>
-        <FontAwesomeIcon
-          icon={faQuestionCircle}
-          color={colors.white}
-          size={20}
-        />
-        <Text style={styles.drawerItemText}>{strings.about}</Text>
+        <View className="flex-row gap-4">
+          <Icon
+            icon={faQuestionCircle}
+            color={
+              drawerItemIndex === 7
+                ? 'dark:bg-neutral-50'
+                : 'bg-neutral-900 dark:bg-neutral-50'
+            }
+            size={20}
+          />
+          <Text className="text-xl">{strings.about}</Text>
+        </View>
       </Pressable>
     </View>
   );

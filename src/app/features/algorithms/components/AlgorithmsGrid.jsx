@@ -4,7 +4,6 @@ import {Image, Pressable, View} from 'react-native';
 import {FlatGrid, SectionGrid} from 'react-native-super-grid';
 import {useDispatch, useSelector} from 'react-redux';
 import {Text} from '_components';
-import {colors} from '_features/theme';
 import {loadFromLocalStorage, saveToLocalStorage} from '_libs';
 import AlgorithmsModal from '../modals/AlgorithmsModal';
 import {
@@ -16,7 +15,7 @@ import {
   toggleAlgorithmsModalVisibility,
 } from '../redux/algorithmsGridSlice';
 import {toggleAlgorithmsModalVisibilityFromModal} from '../redux/algorithmsModalSlice';
-import styles from '../styles/algorithmsGridStyle';
+import {useHexColor} from '../../../hooks/useHexColor';
 
 const AlgorithmsGrid = props => {
   const algorithmsData = useSelector(
@@ -51,7 +50,7 @@ const AlgorithmsGrid = props => {
     };
 
     loadDataFromStorage();
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     const saveCompletedAlgorithms = async () => {
@@ -101,34 +100,34 @@ const AlgorithmsGrid = props => {
             );
       }}>
       <View
-        style={[
-          {
-            backgroundColor: completedAlgorithms[props.puzzle][
-              props.category
-            ].includes(index)
-              ? colors.green
-              : colors.primary,
-          },
-          styles.itemView,
-        ]}>
-        <Text style={styles.itemText}>{item.name}</Text>
-        <Divider color={colors.white} />
-        <Image
-          source={{
-            uri: `http://cube.rider.biz/visualcube.php?fmt=png&size=150&pzl=${
-              puzzle + 2
-            }&alg=${item.scrambles[0]}&stage=${props.category}&view=${
-              props.category !== 'f2l' && 'plan'
-            }&arw=${item.arrow !== null ? item.arrow : ''}&bg=t`,
-          }}
-          style={styles.image}
-        />
+        className={`rounded-md ${
+          completedAlgorithms[props.puzzle][props.category].includes(index)
+            ? 'bg-green-700'
+            : 'bg-neutral-800'
+        }`}>
+        <Text className="m-2 text-center">{item.name}</Text>
+        <Divider color={useHexColor('bg-neutral-50')} />
+        <View className="items-center justify-center">
+          <View className="absolute h-12 w-12 rounded-full [elevation:50] [shadow-color:#FFFFFF] [shadow-offset:{width:0;height:0}]" />
+          <Image
+            source={{
+              uri: `http://cube.rider.biz/visualcube.php?fmt=png&size=150&pzl=${
+                puzzle + 2
+              }&alg=${item.scrambles[0]}&stage=${props.category}&view=${
+                props.category !== 'f2l' && 'plan'
+              }&arw=${item.arrow !== null ? item.arrow : ''}&bg=t`,
+            }}
+            className="h-24 w-24 m-2 self-center"
+          />
+        </View>
       </View>
     </Pressable>
   );
 
   const _renderSectionHeader = section => (
-    <Text style={styles.sectionTitle}>{section.title}</Text>
+    <Text className="p-2 text-lg bg-neutral-200 dark:bg-neutral-700">
+      {section.title}
+    </Text>
   );
 
   const _getSections = sections => {
@@ -153,10 +152,10 @@ const AlgorithmsGrid = props => {
   };
 
   const _downloadInfo = () => (
-    <View style={styles.downloadView}>
+    <View className="flex-1 items-center justify-center">
       <Button title="Download" onPress={_download} />
-      <View style={styles.downloadInfoView}>
-        <Text style={styles.downloadInfoText}>{props.downloadInfo}</Text>
+      <View className="m-5">
+        <Text>{props.downloadInfo}</Text>
       </View>
     </View>
   );
@@ -164,14 +163,13 @@ const AlgorithmsGrid = props => {
   const _flatGrid = () => (
     <FlatGrid
       itemDimension={100}
-      itemContainerStyle={styles.itemContainer}
-      stickySectionHeadersEnabled={true}
+      stickySectionHeadersEnabled
       data={algorithmsData[props.puzzle][props.category].algorithms}
       renderItem={_renderItem}
-      removeClippedSubviews={true}
+      removeClippedSubviews
       getItemLayout={(_, index) => ({
-        length: 100,
-        offset: 100 * index,
+        length: 96,
+        offset: 96 * index,
         index,
       })}
       showsVerticalScrollIndicator={false}
@@ -181,18 +179,17 @@ const AlgorithmsGrid = props => {
   const _sectionGrid = () => (
     <SectionGrid
       itemDimension={100}
-      itemContainerStyle={styles.itemContainer}
-      stickySectionHeadersEnabled={true}
+      stickySectionHeadersEnabled
       sections={_getSections(
         algorithmsData[props.puzzle][props.category].sections,
       )}
       data={algorithmsData[props.puzzle][props.category].algorithms}
       renderItem={_renderItem}
       renderSectionHeader={_renderSectionHeader}
-      removeClippedSubviews={true}
+      removeClippedSubviews
       getItemLayout={(_, index) => ({
-        length: 100,
-        offset: 100 * index,
+        length: 96,
+        offset: 96 * index,
         index,
       })}
       showsVerticalScrollIndicator={false}
@@ -200,7 +197,7 @@ const AlgorithmsGrid = props => {
   );
 
   return (
-    <View style={styles.mainContainer}>
+    <View className="flex-1 bg-neutral-50 dark:bg-neutral-900">
       {isAlgorithmsModalVisible && (
         <AlgorithmsModal
           puzzle={props.puzzle}

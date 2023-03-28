@@ -46,6 +46,6 @@ export const clearLocalStorage = async () => {
   try {
     await AsyncStorage.clear();
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };

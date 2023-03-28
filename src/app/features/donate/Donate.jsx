@@ -7,8 +7,8 @@ const Donate = () => {
 
   return (
     <WebView
-      allowsBackForwardNavigationGestures={true}
-      javaScriptEnabled={true}
+      allowsBackForwardNavigationGestures
+      javaScriptEnabled
       source={{
         uri: 'https://www.buymeacoffee.com/arihantb',
       }}

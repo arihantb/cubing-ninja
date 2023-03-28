@@ -1,7 +1,7 @@
 import React, {memo} from 'react';
-import {Provider} from 'react-redux';
-import {Home} from '_features/home';
 import store from '_redux/store';
+import {Home} from '_features/home';
+import {Provider} from 'react-redux';
 
 const Root = () => (
   <Provider store={store}>

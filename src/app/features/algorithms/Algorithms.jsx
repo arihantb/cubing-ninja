@@ -8,96 +8,10 @@ import {ImageMessage, Text} from '_components';
 import {strings} from '_data/strings';
 import {useDoubleBackTapToExit} from '_hooks/useDoubleBackTapToExit';
 import AlgorithmsGrid from './components/AlgorithmsGrid';
-import styles from './styles/algorithmsStyle';
+import {useHexColor} from '../../hooks/useHexColor';
 
 const TopTab = createMaterialTopTabNavigator();
 const BottomTab = createMaterialTopTabNavigator();
-
-const _topBarLabel = (focused, label) => (
-  <Text style={focused ? styles.tabBarLabelBlue : styles.tabBarLabelWhite}>
-    {label}
-  </Text>
-);
-
-const _bottomTabScreen = (key, puzzle, name, category, downloadInfo) => (
-  <BottomTab.Screen
-    key={key}
-    name={name}
-    options={{
-      tabBarIndicatorStyle: styles.tabBarIndicator,
-      tabBarStyle: styles.tabBar,
-      tabBarLabel: ({focused}) => _topBarLabel(focused, name),
-    }}>
-    {() => (
-      <AlgorithmsGrid
-        puzzle={puzzle}
-        category={category}
-        downloadInfo={downloadInfo}
-      />
-    )}
-  </BottomTab.Screen>
-);
-
-const _bottomTabNavigator = (key, puzzle, data) => (
-  <BottomTab.Navigator
-    key={key}
-    initialRouteName={data[0].name}
-    screenOptions={{
-      headerShown: false,
-      tabBarScrollEnabled: data.length > 4,
-    }}
-    tabBarStyle={styles.tabBar}
-    tabBarPosition="bottom">
-    {data.map((item, idx) =>
-      _bottomTabScreen(
-        idx,
-        puzzle,
-        item.name,
-        item.category,
-        item.downloadInfo,
-      ),
-    )}
-  </BottomTab.Navigator>
-);
-
-const _topTabScreen = (key, name, puzzle, data) => (
-  <TopTab.Screen
-    key={key}
-    name={name}
-    options={{
-      tabBarIndicatorStyle: styles.tabBarIndicator,
-      tabBarStyle: styles.tabBar,
-      tabBarLabel: ({focused}) => _topBarLabel(focused, name),
-      tabBarBounces: false,
-    }}>
-    {() => {
-      if (data.length === 1) {
-        return (
-          <AlgorithmsGrid
-            puzzle={puzzle}
-            category={data[0].category}
-            downloadInfo={data[0].downloadInfo}
-          />
-        );
-      }
-      return _bottomTabNavigator(key, puzzle, data);
-    }}
-  </TopTab.Screen>
-);
-
-const _topTabNavigator = (key, data) => (
-  <TopTab.Navigator
-    key={key}
-    initialRouteName={data[0].name}
-    screenOptions={{
-      headerShown: false,
-      swipeEnabled: false,
-    }}>
-    {data.map((item, idx) =>
-      _topTabScreen(idx, item.name, item.puzzle, item.data),
-    )}
-  </TopTab.Navigator>
-);
 
 const _twoByTwoMethods = [
   {
@@ -271,29 +185,118 @@ const _fourByFourMethods = [
   },
 ];
 
-const _topTabNavigators = [
-  _topTabNavigator(0, _twoByTwoMethods),
-  _topTabNavigator(1, _threeByThreeMethods),
-  _topTabNavigator(2, _fourByFourMethods),
-  <ImageMessage message={strings.comingSoon} key={3} />,
-  <ImageMessage message={strings.comingSoon} key={4} />,
-  <ImageMessage message={strings.comingSoon} key={5} />,
-  <ImageMessage message={strings.comingSoon} key={6} />,
-  <ImageMessage message={strings.comingSoon} key={7} />,
-  <ImageMessage message={strings.comingSoon} key={8} />,
-  <ImageMessage message={strings.comingSoon} key={9} />,
-  <ImageMessage message={strings.comingSoon} key={10} />,
-];
-
 const Algorithms = () => {
   const puzzle = useSelector(state => state.home.puzzle);
 
   useDoubleBackTapToExit();
 
+  const _topBarLabel = (focused, label) => (
+    <Text
+      className={`text-lg ${focused ? 'text-indigo-500' : 'text-neutral-50'}`}>
+      {label}
+    </Text>
+  );
+
+  const _bottomTabScreen = (key, puzzle, name, category, downloadInfo) => (
+    <BottomTab.Screen
+      key={key}
+      name={name}
+      options={{
+        tabBarIndicatorStyle: {top: 0},
+        tabBarStyle: {backgroundColor: useHexColor('bg-neutral-800')},
+        tabBarLabel: ({focused}) => _topBarLabel(focused, name),
+      }}>
+      {() => (
+        <AlgorithmsGrid
+          puzzle={puzzle}
+          category={category}
+          downloadInfo={downloadInfo}
+        />
+      )}
+    </BottomTab.Screen>
+  );
+
+  const _bottomTabNavigator = (key, puzzle, data) => (
+    <BottomTab.Navigator
+      key={key}
+      initialRouteName={data[0].name}
+      screenOptions={{
+        headerShown: false,
+        tabBarScrollEnabled: data.length > 4,
+      }}
+      tabBarStyle={{backgroundColor: useHexColor('bg-neutral-800')}}
+      tabBarPosition="bottom">
+      {data.map((item, idx) =>
+        _bottomTabScreen(
+          idx,
+          puzzle,
+          item.name,
+          item.category,
+          item.downloadInfo,
+        ),
+      )}
+    </BottomTab.Navigator>
+  );
+
+  const _topTabScreen = (key, name, puzzle, data) => (
+    <TopTab.Screen
+      key={key}
+      name={name}
+      options={{
+        tabBarIndicatorStyle: {top: 0},
+        tabBarStyle: {backgroundColor: useHexColor('bg-neutral-800')},
+        tabBarLabel: ({focused}) => _topBarLabel(focused, name),
+        tabBarBounces: false,
+      }}>
+      {() => {
+        if (data.length === 1) {
+          return (
+            <AlgorithmsGrid
+              puzzle={puzzle}
+              category={data[0].category}
+              downloadInfo={data[0].downloadInfo}
+            />
+          );
+        }
+        return _bottomTabNavigator(key, puzzle, data);
+      }}
+    </TopTab.Screen>
+  );
+
+  const _topTabNavigator = (key, data) => (
+    <TopTab.Navigator
+      key={key}
+      initialRouteName={data[0].name}
+      screenOptions={{
+        headerShown: false,
+        swipeEnabled: false,
+      }}>
+      {data.map((item, idx) =>
+        _topTabScreen(idx, item.name, item.puzzle, item.data),
+      )}
+    </TopTab.Navigator>
+  );
+
+  const _topTabNavigators = [
+    _topTabNavigator(0, _twoByTwoMethods),
+    _topTabNavigator(1, _threeByThreeMethods),
+    _topTabNavigator(2, _fourByFourMethods),
+    <ImageMessage message={strings.comingSoon} key={3} />,
+    <ImageMessage message={strings.comingSoon} key={4} />,
+    <ImageMessage message={strings.comingSoon} key={5} />,
+    <ImageMessage message={strings.comingSoon} key={6} />,
+    <ImageMessage message={strings.comingSoon} key={7} />,
+    <ImageMessage message={strings.comingSoon} key={8} />,
+    <ImageMessage message={strings.comingSoon} key={9} />,
+    <ImageMessage message={strings.comingSoon} key={10} />,
+  ];
+
   return (
     <SafeAreaProvider>
-      <NavigationContainer independent={true}>
-        <View style={styles.mainView}>{_topTabNavigators[puzzle]}</View>
+      <NavigationContainer independent>
+        <View className="flex-1 bg-neutral-50 dark:bg-neutral-900">
+          {_topTabNavigators[puzzle]}
+        </View>
       </NavigationContainer>
     </SafeAreaProvider>
   );

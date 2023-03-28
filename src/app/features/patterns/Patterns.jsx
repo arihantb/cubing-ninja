@@ -2,10 +2,9 @@ import React, {memo} from 'react';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {View} from 'react-native';
 import {useSelector} from 'react-redux';
-import {ImageMessage, Text} from '_components';
+import {ImageMessage} from '_components';
 import PatternsGrid from './components/PatternsGrid';
 import {strings} from '_data/strings';
-import {colors} from '_features/theme';
 import {useDoubleBackTapToExit} from '_hooks/useDoubleBackTapToExit';
 
 const _twoByTwo = {
@@ -56,7 +55,7 @@ const PatternsNavigation = () => {
 
   return (
     <SafeAreaProvider>
-      <View style={{flex: 1, backgroundColor: colors.primary}}>
+      <View className="flex-1 bg-neutral-50 dark:bg-neutral-900">
         {patterns[puzzle]}
       </View>
     </SafeAreaProvider>

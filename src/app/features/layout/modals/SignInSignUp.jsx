@@ -1,24 +1,15 @@
 import Modal from 'react-native-modal';
 import React, {memo, useCallback, useEffect, useRef} from 'react';
-import {Input} from 'react-native-elements';
-import {
-  ActivityIndicator,
-  Animated,
-  Image,
-  Pressable,
-  View,
-} from 'react-native';
+import {Image, Pressable, View} from 'react-native';
 import {useNetInfo} from '@react-native-community/netinfo';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useDispatch, useSelector} from 'react-redux';
-import {Header, Text} from '_components';
+import {Header, Input, Loading, Text} from '_components';
 import {strings} from '_data/strings';
-import {colors} from '_features/theme';
 import {
   setLoggedInStatus,
   toggleSignInSignUpVisibility,
 } from '../redux/navigationDrawerSlice';
-import styles from '../styles/signInSignUpStyle';
 import {
   setConfirmPassword,
   setConfirmPasswordInputError,
@@ -43,7 +34,6 @@ import {
 } from '../redux/signInSignUpSlice';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {
   faEnvelope,
   faEye,
@@ -57,11 +47,11 @@ import {logo} from '../../../assets/images';
 import ForgotPasswordModal from './ForgotPasswordModal';
 import {toggleForgotPasswordModalVisibilityFromModal} from '../redux/forgotPasswordModalSlice';
 import {getSolves} from '../../../utils';
+import {Icon} from '../../../components';
 
 const SignInSignUp = () => {
   const netInfo = useNetInfo();
 
-  const heightAnim = useRef(new Animated.Value(100)).current;
   const confirmPasswordInput = useRef();
   const emailInput = useRef();
   const passwordInput = useRef();
@@ -270,29 +260,9 @@ const SignInSignUp = () => {
   }, [dispatch, _setError, confirmPassword, email, password, username]);
 
   useEffect(() => {
-    const heightAnimIn = () => {
-      dispatch(setUsernameInputVisibility(false));
-      dispatch(setConfirmPasswordInputVisibility(false));
-      Animated.timing(heightAnim, {
-        toValue: 100,
-        duration: 300,
-        useNativeDriver: false,
-      }).start();
-    };
-
-    const heightAnimOut = () => {
-      Animated.timing(heightAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: false,
-      }).start(() => {
-        dispatch(setUsernameInputVisibility(true));
-        dispatch(setConfirmPasswordInputVisibility(true));
-      });
-    };
-
-    mode === strings.signIn ? heightAnimIn() : heightAnimOut();
-  }, [dispatch, heightAnim, mode]);
+    dispatch(setUsernameInputVisibility(mode === strings.signUp));
+    dispatch(setConfirmPasswordInputVisibility(mode === strings.signUp));
+  }, [dispatch, mode]);
 
   return (
     <Modal
@@ -303,49 +273,32 @@ const SignInSignUp = () => {
       animationIn="slideInRight"
       animationOut="slideOutRight"
       hasBackdrop={false}
-      style={styles.modalView}
+      className="m-0"
       isVisible={isSignInSignUpVisible}>
       {isForgotPasswordModalVisible && <ForgotPasswordModal />}
-      <View style={styles.modalContainer}>
+      <View className="flex-1 bg-neutral-50 dark:bg-neutral-900">
         <Header
           title={mode}
-          hideModal={() => dispatch(toggleSignInSignUpVisibilityFromModal())}
+          backButtonAction={() =>
+            dispatch(toggleSignInSignUpVisibilityFromModal())
+          }
         />
         {netInfo.isConnected && netInfo.isInternetReachable ? (
-          <View style={styles.mainView}>
-            <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
-              <View style={styles.mainContainer}>
-                <Image source={{uri: logo}} style={styles.logo} />
-              </View>
-              <Animated.View
-                style={{
-                  height: heightAnim.interpolate({
-                    inputRange: [0, 100],
-                    outputRange: [errorMessage.email ? 90 : 75, 0],
-                  }),
-                }}>
+          <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+            <View className="items-center">
+              <Image source={{uri: logo}} />
+            </View>
+            <View className="p-4 gap-4">
+              <View>
                 {isUsernameInputVisible && (
                   <Input
                     ref={usernameInput}
                     inputMode="text"
                     returnKeyType="next"
                     placeholder={strings.username}
-                    leftIcon={
-                      <FontAwesomeIcon
-                        icon={faUser}
-                        size={18}
-                        color={colors.greyDark}
-                      />
-                    }
-                    leftIconContainerStyle={styles.leftIconStyle}
-                    inputContainerStyle={[
-                      errorMessage.username && {borderColor: colors.red},
-                      styles.inputContainer,
-                    ]}
-                    inputStyle={styles.input}
+                    leftIcon={faUser}
                     value={username}
                     onChangeText={text => dispatch(setUsername(text))}
-                    errorStyle={errorMessage.username && styles.errorMessage}
                     errorMessage={errorMessage.username}
                     onSubmitEditing={() =>
                       isUsernameInputVisible
@@ -354,102 +307,65 @@ const SignInSignUp = () => {
                     }
                   />
                 )}
-              </Animated.View>
-              <Input
-                ref={emailInput}
-                inputMode="email"
-                returnKeyType="next"
-                placeholder={strings.email}
-                leftIcon={
-                  <FontAwesomeIcon
-                    icon={faEnvelope}
-                    size={18}
-                    color={colors.greyDark}
-                  />
-                }
-                leftIconContainerStyle={styles.leftIconStyle}
-                inputContainerStyle={[
-                  errorMessage.email && {borderColor: colors.red},
-                  styles.inputContainer,
-                ]}
-                inputStyle={styles.input}
-                value={email}
-                onChangeText={text => dispatch(setEmail(text))}
-                errorStyle={errorMessage.email && styles.errorMessage}
-                errorMessage={errorMessage.email}
-                onSubmitEditing={() => passwordInput.current.focus()}
-              />
-              <Input
-                ref={passwordInput}
-                inputMode="text"
-                returnKeyType="next"
-                placeholder={strings.password}
-                leftIcon={
-                  <FontAwesomeIcon
-                    icon={faLock}
-                    size={18}
-                    color={colors.greyDark}
-                  />
-                }
-                rightIcon={
-                  <Pressable
-                    onPressIn={() => {
-                      if (!isPasswordShown) {
-                        dispatch(toggleShowPasswordStatus());
-                      }
-                    }}
-                    onPressOut={() => {
-                      if (isPasswordShown) {
-                        dispatch(toggleShowPasswordStatus());
-                      }
-                    }}>
-                    <FontAwesomeIcon
-                      icon={isPasswordShown ? faEye : faEyeSlash}
-                      size={isPasswordShown ? 20 : 22}
-                      color={colors.greyDark}
-                    />
-                  </Pressable>
-                }
-                leftIconContainerStyle={styles.leftIconStyle}
-                rightIconContainerStyle={{
-                  paddingRight: (!isPasswordShown && 14) || 15,
-                }}
-                secureTextEntry={!isPasswordShown}
-                inputContainerStyle={[
-                  errorMessage.password && {borderColor: colors.red},
-                  styles.inputContainer,
-                ]}
-                inputStyle={styles.input}
-                value={password}
-                onChangeText={text => dispatch(setPassword(text))}
-                errorStyle={errorMessage.password && styles.errorMessage}
-                errorMessage={errorMessage.password}
-                onSubmitEditing={() =>
-                  isConfirmPasswordInputVisible
-                    ? confirmPasswordInput.current.focus()
-                    : _submit()
-                }
-              />
-              <Animated.View
-                style={{
-                  height: heightAnim.interpolate({
-                    inputRange: [0, 100],
-                    outputRange: [errorMessage.confirmPassword ? 90 : 75, 0],
-                  }),
-                }}>
+              </View>
+              <View>
+                <Input
+                  ref={emailInput}
+                  inputMode="email"
+                  returnKeyType="next"
+                  placeholder={strings.email}
+                  leftIcon={faEnvelope}
+                  value={email}
+                  onChangeText={text => dispatch(setEmail(text))}
+                  errorMessage={errorMessage.email}
+                  onSubmitEditing={() => passwordInput.current.focus()}
+                />
+              </View>
+              <View>
+                <Input
+                  ref={passwordInput}
+                  inputMode="text"
+                  returnKeyType="next"
+                  placeholder={strings.password}
+                  leftIcon={faLock}
+                  rightIcon={
+                    <Pressable
+                      onPressIn={() => {
+                        if (!isPasswordShown) {
+                          dispatch(toggleShowPasswordStatus());
+                        }
+                      }}
+                      onPressOut={() => {
+                        if (isPasswordShown) {
+                          dispatch(toggleShowPasswordStatus());
+                        }
+                      }}>
+                      <Icon
+                        icon={isPasswordShown ? faEye : faEyeSlash}
+                        size={isPasswordShown ? 20 : 22}
+                        color="bg-neutral-400"
+                      />
+                    </Pressable>
+                  }
+                  secureTextEntry={!isPasswordShown}
+                  value={password}
+                  onChangeText={text => dispatch(setPassword(text))}
+                  errorMessage={errorMessage.password}
+                  onSubmitEditing={() =>
+                    isConfirmPasswordInputVisible
+                      ? confirmPasswordInput.current.focus()
+                      : _submit()
+                  }
+                />
+              </View>
+              <View>
                 {isConfirmPasswordInputVisible && (
                   <Input
                     ref={confirmPasswordInput}
                     inputMode="text"
                     returnKeyType="go"
                     placeholder={strings.confirmPassword}
-                    leftIcon={
-                      <FontAwesomeIcon
-                        icon={faLock}
-                        size={18}
-                        color={colors.greyDark}
-                      />
-                    }
+                    leftIcon={faLock}
                     rightIcon={
                       <Pressable
                         onPressIn={() => {
@@ -462,74 +378,69 @@ const SignInSignUp = () => {
                             dispatch(toggleShowConfirmPasswordStatus());
                           }
                         }}>
-                        <FontAwesomeIcon
+                        <Icon
                           icon={isConfirmPasswordShown ? faEye : faEyeSlash}
                           size={isConfirmPasswordShown ? 20 : 22}
-                          color={colors.greyDark}
+                          color="bg-neutral-400"
                         />
                       </Pressable>
                     }
-                    leftIconContainerStyle={styles.leftIconStyle}
-                    rightIconContainerStyle={{
-                      paddingRight: (!isConfirmPasswordShown && 14) || 15,
-                    }}
                     secureTextEntry={!isConfirmPasswordShown}
-                    inputContainerStyle={[
-                      errorMessage.confirmPassword && {borderColor: colors.red},
-                      styles.inputContainer,
-                    ]}
-                    inputStyle={styles.input}
                     value={confirmPassword}
                     onChangeText={text => dispatch(setConfirmPassword(text))}
-                    errorStyle={
-                      errorMessage.confirmPassword && styles.errorMessage
-                    }
                     errorMessage={errorMessage.confirmPassword}
                     onSubmitEditing={() => _submit()}
                   />
                 )}
-              </Animated.View>
-              {mode === strings.signIn && (
-                <View style={styles.forgotPassword}>
-                  <Pressable
-                    onPress={() => {
-                      dispatch(toggleForgotPasswordModalVisibility());
-                      dispatch(toggleForgotPasswordModalVisibilityFromModal());
-                    }}>
-                    <Text style={styles.forgotPasswordText}>
-                      {strings.forgotPassword}
-                    </Text>
-                  </Pressable>
-                </View>
-              )}
-              <Pressable
-                style={_isInvalidInput ? styles.buttonDisabled : styles.button}
-                disabled={_isInvalidInput}
-                onPress={() => _submit()}>
-                {isLoggingIn ? (
-                  <ActivityIndicator color={colors.white} size="large" />
-                ) : (
-                  <Text style={styles.buttonText}>{mode}</Text>
-                )}
-              </Pressable>
-              <View style={styles.bottomView}>
-                <Text style={styles.bottomText}>
-                  {mode === strings.signIn
-                    ? strings.dontHaveAccountYet
-                    : strings.alreadyHaveAnAccount}
-                </Text>
-                <Pressable onPress={() => dispatch(toggleMode())}>
-                  <Text style={styles.signInSignUpToggle}>
-                    {mode === strings.signIn ? strings.signUp : strings.signIn}
-                  </Text>
+              </View>
+            </View>
+            {mode === strings.signIn && (
+              <View className="m-4 items-end">
+                <Pressable
+                  onPress={() => {
+                    dispatch(toggleForgotPasswordModalVisibility());
+                    dispatch(toggleForgotPasswordModalVisibilityFromModal());
+                  }}>
+                  <Text>{strings.forgotPassword}</Text>
                 </Pressable>
               </View>
-            </KeyboardAwareScrollView>
-          </View>
+            )}
+            <Pressable
+              className={`m-4 p-4 rounded-md items-center justify-center ${
+                _isInvalidInput ? 'bg-indigo-300' : 'bg-indigo-500'
+              }`}
+              disabled={_isInvalidInput}
+              onPress={() => _submit()}>
+              {isLoggingIn ? (
+                <Loading color="bg-indigo-500" />
+              ) : (
+                <Text className="text-lg text-neutral-50">{mode}</Text>
+              )}
+            </Pressable>
+            <View className="flex-row gap-2 items-center justify-center">
+              <Text>
+                {mode === strings.signIn
+                  ? strings.dontHaveAccountYet
+                  : strings.alreadyHaveAnAccount}
+              </Text>
+              <Pressable
+                onPress={() => {
+                  dispatch(setUsernameInputError(''));
+                  dispatch(setEmailInputError(''));
+                  dispatch(setPasswordInputError(''));
+                  dispatch(setConfirmPasswordInputError(''));
+                  dispatch(toggleMode());
+                }}>
+                <Text className="text-indigo-500">
+                  {mode === strings.signIn ? strings.signUp : strings.signIn}
+                </Text>
+              </Pressable>
+            </View>
+          </KeyboardAwareScrollView>
         ) : (
-          <View style={styles.noInternet}>
-            <Text style={styles.noInternetText}>No Internet</Text>
-          </View>
+          <Text className="w-full p-2 text-lg text-neutral-50 bg-red-500 text-center">
+            No Internet
+          </Text>
         )}
       </View>
     </Modal>

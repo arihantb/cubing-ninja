@@ -9,7 +9,6 @@ import {toggleSelectAlgorithmsVisibility} from '_reducers/containers/AppSlice';
 import Header from '_components/Header';
 import AlgorithmsNavigation from '_containers/algorithms/AlgorithmsNavigation';
 import {Strings} from '_data/Strings';
-import {colors} from '_features/theme';
 
 const SelectAlgorithms = () => {
   const puzzle = useSelector(state => state.homeReducer.puzzle);
@@ -25,7 +24,7 @@ const SelectAlgorithms = () => {
       hasBackdrop={false}
       style={{margin: 0}}
       isVisible={visible}>
-      <View
+      {/* <View
         style={{
           flex: 1,
           flexDirection: 'column',
@@ -39,7 +38,7 @@ const SelectAlgorithms = () => {
           }
         />
         <AlgorithmsNavigation puzzle={puzzle} />
-      </View>
+      </View> */}
     </Modal>
   );
 };

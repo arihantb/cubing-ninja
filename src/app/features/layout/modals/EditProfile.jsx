@@ -4,9 +4,8 @@ import {Avatar} from 'react-native-elements';
 import {Pressable, View} from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {useDispatch, useSelector} from 'react-redux';
-import {Header} from '_components';
+import {Header, Text} from '_components';
 import {strings} from '_data/strings';
-import styles from '../styles/editProfileStyle';
 import {
   setEmailFromModal,
   setProfileFromModal,
@@ -22,7 +21,6 @@ import {
   setProfile,
   toggleEditProfileVisibility,
 } from '../redux/navigationDrawerSlice';
-import {Text} from '../../../components';
 import {loadFromLocalStorage, saveToLocalStorage} from '../../../libs';
 import auth from '@react-native-firebase/auth';
 import {toggleChangeEmailModalVisibilityFromModal} from '../redux/changeEmailModalSlice';
@@ -75,7 +73,7 @@ const EditProfile = () => {
               photoURL: response.assets[0].uri,
             });
           } catch (err) {
-            console.log(err);
+            console.error(err);
           }
 
           saveToLocalStorage('userData', userData);
@@ -104,58 +102,61 @@ const EditProfile = () => {
       animationIn="slideInRight"
       animationOut="slideOutRight"
       hasBackdrop={false}
-      style={styles.modalView}
+      className="m-0"
+      statusBarTranslucent
       isVisible={isEditProfileVisible}>
       {isChangeEmailModalVisible && <ChangeEmailModal />}
       {isChangePasswordModalVisible && <ChangePasswordModal />}
       {isChangeUsernameModalVisible && <ChangeUsernameModal />}
       {isConfirmDeleteAccountModalVisible && <ConfirmDeleteAccountModal />}
-      <View style={styles.modalContainer}>
+      <View className="flex-1 bg-neutral-50 dark:bg-neutral-900">
         <Header
           title={strings.profile}
-          hideModal={() => dispatch(toggleEditProfileVisibilityFromModal())}
+          onClose={() => {
+            dispatch(toggleEditProfileVisibilityFromModal());
+          }}
         />
         {netInfo.isConnected && netInfo.isInternetReachable ? (
-          <>
+          <View className="p-4 gap-8">
             <Pressable
               onPress={() => launchImageLibrary({}, avatarPickerCallback)}>
               <Avatar
                 size="large"
                 source={{uri: isLoggedIn ? profile : constants.placeholderUser}}
-                overlayContainerStyle={styles.avatarBackground}
-                containerStyle={styles.avatar}
               />
             </Pressable>
-            <View style={styles.row}>
-              <Text style={styles.label}>Username</Text>
+            <View className="flex-row justify-between">
+              <Text className="text-lg">Username</Text>
               <Pressable
                 onPress={() => {
                   dispatch(toggleChangeUsernameModalVisibility());
                   dispatch(toggleChangeUsernameModalVisibilityFromModal());
                 }}>
-                <Text style={styles.username}>{username}</Text>
+                <Text className="text-lg text-indigo-500">{username}</Text>
               </Pressable>
             </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Email</Text>
+            <View className="flex-row justify-between">
+              <Text className="text-lg">Email</Text>
               <Pressable
                 onPress={() => {
                   dispatch(toggleChangeEmailModalVisibility());
                   dispatch(toggleChangeEmailModalVisibilityFromModal());
                 }}>
-                <Text style={styles.email}>{email}</Text>
+                <Text className="text-lg text-indigo-500">{email}</Text>
               </Pressable>
             </View>
-            <View style={styles.row}>
+            <View className="flex-row justify-between">
               <Pressable
                 onPress={() => {
                   dispatch(toggleChangePasswordModalVisibility());
                   dispatch(toggleChangePasswordModalVisibilityFromModal());
                 }}>
-                <Text style={styles.password}>{strings.changePassword}</Text>
+                <Text className="text-lg text-indigo-500">
+                  {strings.changePassword}
+                </Text>
               </Pressable>
             </View>
-            <View style={styles.row}>
+            <View className="flex-row justify-between">
               <Pressable
                 onPress={() => {
                   dispatch(toggleConfirmDeleteAccountModalVisibility());
@@ -163,7 +164,7 @@ const EditProfile = () => {
                     toggleConfirmDeleteAccountModalVisibilityFromModal(),
                   );
                 }}>
-                <Text style={styles.deleteAccount}>
+                <Text className="text-lg text-red-500">
                   {strings.deleteAccount}
                 </Text>
               </Pressable>
@@ -175,14 +176,14 @@ const EditProfile = () => {
                   );
                   dispatch(toggleEditProfileVisibilityFromModal());
                 }}>
-                <Text style={styles.signOut}>{strings.signOut}</Text>
+                <Text className="text-lg text-red-500">{strings.signOut}</Text>
               </Pressable>
             </View>
-          </>
-        ) : (
-          <View style={styles.noInternet}>
-            <Text style={styles.noInternetText}>No Internet</Text>
           </View>
+        ) : (
+          <Text className="w-full p-2 text-lg text-neutral-50 bg-red-500 text-center">
+            No Internet
+          </Text>
         )}
       </View>
     </Modal>

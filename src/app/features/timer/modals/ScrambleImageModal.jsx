@@ -2,7 +2,6 @@ import Modal from 'react-native-modal';
 import React, {memo, useState} from 'react';
 import {SvgXml} from 'react-native-svg';
 import {useDispatch, useSelector} from 'react-redux';
-import {colors} from '_features/theme';
 import {toggleScrambleImageModalVisibility} from '../redux/timerScreenSlice';
 
 const ScrambleImageModal = () => {
@@ -19,9 +18,8 @@ const ScrambleImageModal = () => {
       animationIn="fadeIn"
       animationOut="fadeOut"
       backdropOpacity={1}
-      backdropColor={colors.secondary}
-      useNativeDriver={true}
-      useNativeDriverForBackdrop={true}
+      useNativeDriver
+      useNativeDriverForBackdrop
       onModalHide={() => dispatch(toggleScrambleImageModalVisibility())}
       backdropTransitionOutTiming={0}
       isVisible={visible}>

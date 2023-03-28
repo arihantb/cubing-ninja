@@ -1,11 +1,8 @@
-import Modal from 'react-native-modal';
 import React, {memo, useCallback, useEffect, useRef} from 'react';
-import {ActivityIndicator, Pressable, ToastAndroid, View} from 'react-native';
-import {Input} from 'react-native-elements';
-import {strings} from '../../../data/strings';
-import {Text} from '../../../components';
+import {ToastAndroid, View} from 'react-native';
+import {strings} from '_data/strings';
+import {Dialog, Input} from '_components';
 import {useDispatch, useSelector} from 'react-redux';
-import styles from '../styles/changePasswordModalStyle.js';
 import {
   setConfirmPasswordFromModal,
   setConfirmPasswordInputError,
@@ -17,10 +14,8 @@ import {
   toggleChangingPasswordStatus,
 } from '../redux/changePasswordModalSlice';
 import {toggleChangePasswordModalVisibility} from '../redux/editProfileSlice';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faLock} from '@fortawesome/free-solid-svg-icons';
-import {colors} from '../../theme';
 import auth from '@react-native-firebase/auth';
+import {faLock} from '@fortawesome/free-solid-svg-icons';
 
 const ChangePasswordModal = () => {
   const passwordInput = useRef();
@@ -98,10 +93,12 @@ const ChangePasswordModal = () => {
 
   useEffect(() => {
     _setError(
+      passwordInput,
       password.length < 6 && password.length > 0 ? 'At least 6 characters' : '',
     );
 
     _setError(
+      confirmPasswordInput,
       confirmPassword !== password
         ? confirmPassword.length > 0
           ? "Passwords don't match"
@@ -111,74 +108,44 @@ const ChangePasswordModal = () => {
   }, [dispatch, _setError, password, confirmPassword]);
 
   return (
-    <Modal
-      onBackdropPress={() =>
-        dispatch(toggleChangePasswordModalVisibilityFromModal())
-      }
-      onBackButtonPress={() =>
-        dispatch(toggleChangePasswordModalVisibilityFromModal())
-      }
-      useNativeDriver={true}
-      useNativeDriverForBackdrop={true}
-      onModalHide={() => dispatch(toggleChangePasswordModalVisibility())}
-      backdropTransitionOutTiming={0}
-      isVisible={isChangePasswordModalVisible}>
-      <View style={styles.modalView}>
-        <Text style={styles.label}>{strings.changePassword}</Text>
-        <View style={styles.inputView}>
+    <Dialog
+      isInvalid={_isInvalidInput}
+      isVisible={isChangePasswordModalVisible}
+      isLoading={isChangingPassword}
+      onHide={() => dispatch(toggleChangePasswordModalVisibility())}
+      onClose={() => dispatch(toggleChangePasswordModalVisibilityFromModal())}
+      onSubmit={() => {
+        if (!_isInvalidInput) {
+          dispatch(toggleChangingPasswordStatus());
+          _changePassword().then(() =>
+            dispatch(toggleChangingPasswordStatus()),
+          );
+        }
+      }}
+      title={strings.changePassword}>
+      <View className="gap-3">
+        <View>
           <Input
             ref={passwordInput}
             inputMode="text"
             returnKeyType="next"
-            inputStyle={styles.input}
-            secureTextEntry={true}
             placeholder={strings.enterNewPassword}
-            leftIcon={
-              <FontAwesomeIcon
-                icon={faLock}
-                size={18}
-                color={colors.greyDark}
-              />
-            }
-            leftIconContainerStyle={styles.leftIconStyle}
+            leftIcon={faLock}
+            secureTextEntry={true}
             onChangeText={text => dispatch(setPasswordFromModal(text))}
-            inputContainerStyle={[
-              {
-                borderColor: isInvalidPassword ? colors.red : colors.grey,
-              },
-              styles.inputContainer,
-            ]}
-            containerStyle={styles.container}
-            errorStyle={errorMessage.password && styles.errorMessage}
             errorMessage={errorMessage.password}
             onSubmitEditing={() => confirmPasswordInput.current.focus()}
           />
+        </View>
+        <View>
           <Input
             ref={confirmPasswordInput}
-            inputMode="text"
+            inputMode="password"
             returnKeyType="go"
-            inputStyle={styles.input}
-            secureTextEntry={true}
             placeholder={strings.confirmPassword}
-            leftIcon={
-              <FontAwesomeIcon
-                icon={faLock}
-                size={18}
-                color={colors.greyDark}
-              />
-            }
-            leftIconContainerStyle={styles.leftIconStyle}
+            leftIcon={faLock}
+            secureTextEntry={true}
             onChangeText={text => dispatch(setConfirmPasswordFromModal(text))}
-            inputContainerStyle={[
-              {
-                borderColor: isInvalidConfirmPassword
-                  ? colors.red
-                  : colors.grey,
-              },
-              styles.inputContainer,
-            ]}
-            containerStyle={styles.container}
-            errorStyle={errorMessage.confirmPassword && styles.errorMessage}
             errorMessage={errorMessage.confirmPassword}
             onSubmitEditing={() => {
               if (!_isInvalidInput) {
@@ -190,38 +157,8 @@ const ChangePasswordModal = () => {
             }}
           />
         </View>
-        <View style={styles.buttons}>
-          <Pressable
-            onPress={() =>
-              dispatch(toggleChangePasswordModalVisibilityFromModal())
-            }>
-            <Text style={styles.cancelButtonText}>{strings.cancel}</Text>
-          </Pressable>
-          {isChangingPassword ? (
-            <ActivityIndicator color={colors.blue} size="small" />
-          ) : (
-            <Pressable
-              onPress={() => {
-                if (!_isInvalidInput) {
-                  dispatch(toggleChangingPasswordStatus());
-                  _changePassword().then(() =>
-                    dispatch(toggleChangingPasswordStatus()),
-                  );
-                }
-              }}>
-              <Text
-                style={
-                  _isInvalidInput
-                    ? styles.doneButtonTextDisabled
-                    : styles.doneButtonText
-                }>
-                {strings.done}
-              </Text>
-            </Pressable>
-          )}
-        </View>
       </View>
-    </Modal>
+    </Dialog>
   );
 };
 

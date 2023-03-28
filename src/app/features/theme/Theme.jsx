@@ -1,47 +1,40 @@
-import React, {memo, useState} from 'react';
+import React, {memo} from 'react';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {Switch} from 'react-native-elements';
-import {View} from 'react-native';
+import {Switch, View} from 'react-native';
 import {Text} from '_components';
+import {useColorScheme} from 'nativewind';
 import {useDoubleBackTapToExit} from '_hooks/useDoubleBackTapToExit';
-import styles from './styles/themeStyle';
 
 const Theme = () => {
-  const [darkTheme, setDarkTheme] = useState(true);
+  const {colorScheme, toggleColorScheme} = useColorScheme();
 
   useDoubleBackTapToExit();
 
   return (
     <SafeAreaProvider>
-      <View style={styles.mainView}>
-        <View style={{flexDirection: 'row'}}>
-          <View style={styles.copyDeviceInfo}>
-            <Text style={styles.copyDeviceInfoTitle}>Theme</Text>
-            <Text style={styles.copyDeviceInfoSubtitle}>
-              Switch between Light and Dark theme
-            </Text>
+      <View className="flex-1 p-8 gap-8 bg-neutral-50 dark:bg-neutral-900">
+        <View className="flex-row">
+          <View>
+            <Text className="text-lg">Dark Mode</Text>
+            <Text className="text-sm">Switch between Light and Dark theme</Text>
           </View>
           <Switch
-            style={{flex: 1, marginRight: 20}}
-            value={darkTheme}
-            onValueChange={val => setDarkTheme(val)}
+            className="flex-1"
+            isChecked={colorScheme === 'dark'}
+            onToggle={toggleColorScheme}
           />
         </View>
-        <View style={styles.privacyPolicy}>
-          <Text style={styles.copyDeviceInfoTitle}>AppBar Color</Text>
-          <Text style={styles.copyDeviceInfoSubtitle}>
-            Change the color of AppBar
-          </Text>
+        <View>
+          <Text className="text-lg">AppBar Color</Text>
+          <Text className="text-sm">Change the color of AppBar</Text>
         </View>
-        <View style={styles.versionCheck}>
-          <Text style={styles.copyDeviceInfoTitle}>Background Color</Text>
-          <Text style={styles.copyDeviceInfoSubtitle}>
-            Change the color of Background
-          </Text>
+        <View>
+          <Text className="text-lg">Background Color</Text>
+          <Text className="text-sm">Change the color of Background</Text>
         </View>
-        <View style={styles.versionCheck}>
-          <Text style={styles.copyDeviceInfoTitle}>Text Style</Text>
-          <Text style={styles.copyDeviceInfoSubtitle}>
+        <View>
+          <Text className="text-lg">Text Style</Text>
+          <Text className="text-sm">
             Change the font size and color of Text
           </Text>
         </View>

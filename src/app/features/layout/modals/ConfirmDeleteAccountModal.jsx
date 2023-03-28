@@ -1,10 +1,8 @@
-import Modal from 'react-native-modal';
 import React, {memo} from 'react';
-import {ActivityIndicator, Pressable, ToastAndroid, View} from 'react-native';
+import {ToastAndroid} from 'react-native';
 import {strings} from '../../../data/strings';
-import {Text} from '../../../components';
+import {Dialog, Text} from '_components';
 import {useDispatch, useSelector} from 'react-redux';
-import styles from '../styles/confirmDeleteAccountModalStyle.js';
 import {
   setDeletingAccountStatus,
   toggleConfirmDeleteAccountModalVisibilityFromModal,
@@ -18,7 +16,6 @@ import database from '@react-native-firebase/database';
 import {loadFromLocalStorage} from '../../../libs';
 import {clearLocalStorage} from '../../../libs/localStorageManagement';
 import {setLoggedInStatus} from '../redux/navigationDrawerSlice';
-import {colors} from '../../theme';
 
 const ConfirmDeleteAccountModal = () => {
   const isConfirmDeleteAccountModalVisible = useSelector(
@@ -41,7 +38,7 @@ const ConfirmDeleteAccountModal = () => {
           clearLocalStorage();
           ToastAndroid.show('Account deleted successfully', ToastAndroid.LONG);
           dispatch(setLoggedInStatus(false));
-          dispatch(setDeletingAccountStatus(false));
+          dispatch(toggleConfirmDeleteAccountModalVisibilityFromModal());
           dispatch(toggleEditProfileVisibilityFromModal());
         });
     } catch (err) {
@@ -53,46 +50,22 @@ const ConfirmDeleteAccountModal = () => {
   };
 
   return (
-    <Modal
-      onBackdropPress={() =>
+    <Dialog
+      isVisible={isConfirmDeleteAccountModalVisible}
+      isLoading={isDeletingAccount}
+      onHide={() => dispatch(toggleConfirmDeleteAccountModalVisibility())}
+      onClose={() =>
         dispatch(toggleConfirmDeleteAccountModalVisibilityFromModal())
       }
-      onBackButtonPress={() =>
-        dispatch(toggleConfirmDeleteAccountModalVisibilityFromModal())
-      }
-      useNativeDriver={true}
-      useNativeDriverForBackdrop={true}
-      onModalHide={() => dispatch(toggleConfirmDeleteAccountModalVisibility())}
-      backdropTransitionOutTiming={0}
-      isVisible={isConfirmDeleteAccountModalVisible}>
-      <View style={styles.modalView}>
-        <Text style={styles.label}>{strings.areYouSure}</Text>
-        <Text style={styles.info}>{strings.deleteAccountInfo}</Text>
-        <View style={styles.buttons}>
-          <Pressable
-            onPress={() =>
-              dispatch(toggleConfirmDeleteAccountModalVisibilityFromModal())
-            }>
-            <Text style={styles.cancelButtonText}>{strings.cancel}</Text>
-          </Pressable>
-          {isDeletingAccount ? (
-            <ActivityIndicator color={colors.blue} size="small" />
-          ) : (
-            <Pressable
-              onPress={() => {
-                dispatch(setDeletingAccountStatus(true));
-                _deleteAccount().then(() =>
-                  dispatch(
-                    toggleConfirmDeleteAccountModalVisibilityFromModal(),
-                  ),
-                );
-              }}>
-              <Text style={styles.doneButtonText}>{strings.done}</Text>
-            </Pressable>
-          )}
-        </View>
-      </View>
-    </Modal>
+      onSubmit={() => {
+        dispatch(setDeletingAccountStatus(true));
+        _deleteAccount().then(() => dispatch(setDeletingAccountStatus(false)));
+      }}
+      title={strings.areYouSure}>
+      <Text className="text-base [font-family:GoogleSans-Bold] text-neutral-900 dark:text-neutral-400">
+        {strings.deleteAccountInfo}
+      </Text>
+    </Dialog>
   );
 };
 

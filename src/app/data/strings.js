@@ -13,8 +13,9 @@ export const strings = {
   pyraminx: 'Pyraminx',
   square1: 'Square-1',
   clock: 'Clock',
-  enterCustomScramble: 'Enter Custom Scramble',
+  customScramble: 'Custom Scramble',
   clear: 'CLEAR',
+  clearAll: 'CLEAR ALL',
   done: 'DONE',
   timer: 'Timer',
   trainer: 'Trainer',
@@ -45,6 +46,7 @@ export const strings = {
   deleteAccountInfo:
     'This will delete all you account information from the database, including the application data.',
   profile: 'Profile',
+  changeUsername: 'Change Username',
   changeEmail: 'Change Email',
   changePassword: 'Change Password',
   copyDeviceInfoTitle: 'Copy Device Info',

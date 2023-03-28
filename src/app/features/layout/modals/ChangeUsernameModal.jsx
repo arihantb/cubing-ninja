@@ -1,11 +1,8 @@
-import Modal from 'react-native-modal';
 import React, {memo, useCallback, useEffect, useRef} from 'react';
-import {ActivityIndicator, Pressable, ToastAndroid, View} from 'react-native';
-import {Input} from 'react-native-elements';
-import {strings} from '../../../data/strings';
-import {Text} from '../../../components';
+import {ToastAndroid} from 'react-native';
+import {strings} from '_data/strings';
+import {Dialog, Input} from '_components';
 import {useDispatch, useSelector} from 'react-redux';
-import styles from '../styles/changeUsernameModalStyle.js';
 import {
   setUsernameFromModal,
   setUsernameInputError,
@@ -14,11 +11,9 @@ import {
   toggleChangingUsernameStatus,
 } from '../redux/changeUsernameModalSlice';
 import {toggleChangeUsernameModalVisibility} from '../redux/editProfileSlice';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faUser} from '@fortawesome/free-solid-svg-icons';
-import {colors} from '../../theme';
 import auth from '@react-native-firebase/auth';
-import {loadFromLocalStorage, saveToLocalStorage} from '../../../libs';
+import {loadFromLocalStorage, saveToLocalStorage} from '_libs';
 
 const ChangeUsernameModal = () => {
   const usernameInput = useRef();
@@ -81,87 +76,39 @@ const ChangeUsernameModal = () => {
   }, [dispatch, _setError, username]);
 
   return (
-    <Modal
-      onBackdropPress={() =>
-        dispatch(toggleChangeUsernameModalVisibilityFromModal())
-      }
-      onBackButtonPress={() =>
-        dispatch(toggleChangeUsernameModalVisibilityFromModal())
-      }
-      useNativeDriver={true}
-      useNativeDriverForBackdrop={true}
-      onModalHide={() => dispatch(toggleChangeUsernameModalVisibility())}
-      backdropTransitionOutTiming={0}
-      isVisible={isChangeUsernameModalVisible}>
-      <View style={styles.modalView}>
-        <Text style={styles.label}>{strings.changeUsername}</Text>
-        <View style={styles.inputView}>
-          <Input
-            ref={usernameInput}
-            inputMode="username"
-            returnKeyType="go"
-            inputStyle={styles.input}
-            placeholder={strings.enterNewUsername}
-            leftIcon={
-              <FontAwesomeIcon
-                icon={faUser}
-                size={18}
-                color={colors.greyDark}
-              />
-            }
-            leftIconContainerStyle={styles.leftIconStyle}
-            onChangeText={text => dispatch(setUsernameFromModal(text))}
-            inputContainerStyle={[
-              {
-                borderColor: isInvalidUsername ? colors.red : colors.grey,
-              },
-              styles.inputContainer,
-            ]}
-            containerStyle={styles.container}
-            errorStyle={errorMessage && styles.errorMessage}
-            errorMessage={errorMessage}
-            onSubmitEditing={() => {
-              if (!_isInvalidInput) {
-                dispatch(toggleChangingUsernameStatus());
-                _changeUsername().then(() =>
-                  dispatch(toggleChangingUsernameStatus()),
-                );
-              }
-            }}
-          />
-        </View>
-        <View style={styles.buttons}>
-          <Pressable
-            onPress={() =>
-              dispatch(toggleChangeUsernameModalVisibilityFromModal())
-            }>
-            <Text style={styles.cancelButtonText}>{strings.cancel}</Text>
-          </Pressable>
-          {isChangingUsername ? (
-            <ActivityIndicator color={colors.blue} size="small" />
-          ) : (
-            <Pressable
-              onPress={() => {
-                if (!_isInvalidInput) {
-                  dispatch(toggleChangingUsernameStatus());
-                  _changeUsername().then(() =>
-                    dispatch(toggleChangingUsernameStatus()),
-                  );
-                }
-              }}>
-              <Text
-                style={
-                  _isInvalidInput
-                    ? styles.doneButtonTextDisabled
-                    : styles.doneButtonText
-                }>
-                {strings.done}
-              </Text>
-            </Pressable>
-          )}
-        </View>
-      </View>
-    </Modal>
+    <Dialog
+      isInvalid={_isInvalidInput}
+      isVisible={isChangeUsernameModalVisible}
+      isLoading={isChangingUsername}
+      onHide={() => dispatch(toggleChangeUsernameModalVisibility())}
+      onClose={() => dispatch(toggleChangeUsernameModalVisibilityFromModal())}
+      onSubmit={() => {
+        if (!_isInvalidInput) {
+          dispatch(toggleChangingUsernameStatus());
+          _changeUsername().then(() =>
+            dispatch(toggleChangingUsernameStatus()),
+          );
+        }
+      }}
+      title={strings.changeUsername}>
+      <Input
+        ref={usernameInput}
+        inputMode="text"
+        returnKeyType="go"
+        placeholder={strings.enterNewUsername}
+        leftIcon={faUser}
+        onChangeText={text => dispatch(setUsernameFromModal(text))}
+        errorMessage={errorMessage}
+        onSubmitEditing={() => {
+          if (!_isInvalidInput) {
+            dispatch(toggleChangingUsernameStatus());
+            _changeUsername().then(() =>
+              dispatch(toggleChangingUsernameStatus()),
+            );
+          }
+        }}
+      />
+    </Dialog>
   );
 };
 

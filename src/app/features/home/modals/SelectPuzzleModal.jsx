@@ -1,14 +1,14 @@
-import Modal from 'react-native-modal';
 import React, {memo} from 'react';
 import {FlatGrid} from 'react-native-super-grid';
 import {Image, Pressable, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import {Text} from '_components';
+import {Modal, Text} from '_components';
 import {strings} from '_data/strings';
-import {colors} from '_features/theme';
 import {setPuzzle, toggleSelectPuzzleModalVisibility} from '../redux/homeSlice';
-import {toggleSelectPuzzleModalVisibilityFromModal} from '../redux/selectPuzzleModalSlice';
-import styles from '../styles/selectPuzzleModalStyle';
+import {
+  setPuzzleFromModal,
+  toggleSelectPuzzleModalVisibilityFromModal,
+} from '../redux/selectPuzzleModalSlice';
 import {
   clock,
   fiveByFive,
@@ -22,6 +22,7 @@ import {
   threeByThree,
   twoByTwo,
 } from '../../../assets/images';
+import {styled} from 'nativewind';
 
 const data = [
   {
@@ -85,66 +86,54 @@ const SelectPuzzleModal = () => {
   const isSelectPuzzleModalVisible = useSelector(
     state => state.selectPuzzleModal.isSelectPuzzleModalVisible,
   );
-  const puzzle = useSelector(state => state.home.puzzle);
+  const puzzle = useSelector(state => state.selectPuzzleModal.puzzle);
 
   const dispatch = useDispatch();
 
   const _renderItem = ({item}) => (
     <Pressable
       onPress={() => {
-        dispatch(setPuzzle(item.puzzle));
+        dispatch(setPuzzleFromModal(item.puzzle));
         dispatch(toggleSelectPuzzleModalVisibilityFromModal());
       }}>
       <View
-        style={[
-          {
-            backgroundColor:
-              puzzle === item.puzzle ? colors.secondary : colors.secondaryDark,
-          },
-          styles.puzzleView,
-        ]}>
-        <Image style={styles.image} source={{uri: item.image}} />
+        className={`p-3 rounded-md items-center ${
+          puzzle === item.puzzle ? 'bg-slate-900' : 'bg-slate-700'
+        }`}>
+        <Image className="h-10 w-10" source={{uri: item.image}} />
         <Text
-          style={[
-            {color: puzzle === item.puzzle ? colors.greyLight : colors.grey},
-            styles.puzzleLabel,
-          ]}>
+          className={`mt-2 text-lg ${
+            puzzle === item.puzzle && 'text-indigo-500'
+          }`}>
           {item.name}
         </Text>
       </View>
     </Pressable>
   );
 
+  const StyledFlatGrid = styled(FlatGrid, {
+    props: {
+      contentContainerStyle: true,
+    },
+  });
+
   return (
     <Modal
-      onBackdropPress={() =>
-        dispatch(toggleSelectPuzzleModalVisibilityFromModal())
-      }
-      onBackButtonPress={() =>
-        dispatch(toggleSelectPuzzleModalVisibilityFromModal())
-      }
-      useNativeDriver={true}
-      animationInTiming={100}
-      animationOutTiming={100}
-      useNativeDriverForBackdrop={true}
-      onModalHide={() => dispatch(toggleSelectPuzzleModalVisibility())}
-      backdropTransitionOutTiming={0}
+      onClose={() => dispatch(toggleSelectPuzzleModalVisibilityFromModal())}
+      onHide={() => {
+        dispatch(setPuzzle(puzzle));
+        dispatch(toggleSelectPuzzleModalVisibility());
+      }}
+      title={strings.selectPuzzle}
       isVisible={isSelectPuzzleModalVisible}>
-      <View style={styles.modalContainer}>
-        <View style={styles.modalView}>
-          <Text style={styles.selectPuzzleLabel}>{strings.selectPuzzle}</Text>
-          <FlatGrid
-            itemDimension={70}
-            centerContent={true}
-            style={styles.grid}
-            itemContainerStyle={styles.itemContainer}
-            data={data}
-            renderItem={_renderItem}
-            removeClippedSubviews={true}
-            showsVerticalScrollIndicator={false}
-          />
-        </View>
-      </View>
+      <StyledFlatGrid
+        contentContainerStyle="flex-1 justify-center"
+        centerContent
+        data={data}
+        renderItem={_renderItem}
+        removeClippedSubviews
+        showsVerticalScrollIndicator={false}
+      />
     </Modal>
   );
 };

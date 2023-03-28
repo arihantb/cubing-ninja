@@ -7,7 +7,6 @@ import {Card, Header, Text} from '_components';
 import {strings} from '_data/strings';
 import {togglePrivacyPolicyModalVisibilityFromModal} from '../redux/privacyPolicyModalSlice';
 import {togglePrivacyPolicyModalVisibility} from '../redux/aboutSlice';
-import styles from '../styles/privacyPolicyModalStyle';
 
 const PrivacyPolicyModal = () => {
   const isPrivacyPolicyModalVisible = useSelector(
@@ -28,69 +27,63 @@ const PrivacyPolicyModal = () => {
       animationIn="slideInRight"
       animationOut="slideOutRight"
       hasBackdrop={false}
-      style={styles.modal}
+      className="m-0"
       isVisible={isPrivacyPolicyModalVisible}>
-      <View style={styles.mainView}>
+      <View className="flex-1 bg-slate-900">
         <Header
           title={strings.privacyPolicyTitle}
-          hideModal={() =>
+          backButtonAction={() =>
             dispatch(togglePrivacyPolicyModalVisibilityFromModal())
           }
         />
-        <View style={styles.redView}>
-          <Text style={styles.redViewText}>{strings.privacyPolicyRedView}</Text>
+        <View className="p-2 bg-red-500">
+          <Text className="text-slate-900">{strings.privacyPolicyRedView}</Text>
         </View>
-        <View style={styles.orangeView}>
-          <Text style={styles.orangeViewText}>
+        <View className="p-2 bg-yellow-500">
+          <Text className="text-slate-900">
             {strings.privacyPolicyOrangeView}
           </Text>
         </View>
-        <View style={styles.blueView}>
-          <Text style={styles.blueViewText}>
+        <View className="p-2 bg-indigo-500">
+          <Text className="text-slate-900">
             {strings.privacyPolicyBlueView}
           </Text>
         </View>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <Card
-            title={strings.privacyPolicyCardTitle1}
-            subtitle={strings.privacyPolicyCardSubtitle1}
-            cardStyle={styles.card}
-          />
-          <Card
-            title={strings.privacyPolicyCardTitle2}
-            subtitle={strings.privacyPolicyCardSubtitle2}
-            cardStyle={styles.card}
-          />
-          <Card
-            title={strings.privacyPolicyCardTitle3}
-            subtitle={strings.privacyPolicyCardSubtitle3}
-            cardStyle={styles.card}
-          />
-          <Card
-            title={strings.privacyPolicyCardTitle4}
-            subtitle={strings.privacyPolicyCardSubtitle4}
-            cardStyle={styles.card}
-          />
-          <Card
-            title={strings.privacyPolicyCardTitle5}
-            subtitle={strings.privacyPolicyCardSubtitle5}
-            cardStyle={styles.card}
-          />
-          <Card
-            title={strings.privacyPolicyCardTitle6}
-            subtitle={strings.privacyPolicyCardSubtitle6}
-            cardStyle={styles.card}
-          />
-          <Card
-            title={strings.privacyPolicyCardTitle7}
-            subtitle={strings.privacyPolicyCardSubtitle7}
-            cardStyle={styles.card}
-          />
-          <Card
-            title={strings.privacyPolicyCardTitle8}
-            subtitle={strings.privacyPolicyCardSubtitle8}
-            cardStyle={styles.bottomCard}
-          />
+        <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
+          <View className="p-3 gap-3">
+            <Card
+              title={strings.privacyPolicyCardTitle1}
+              subtitle={strings.privacyPolicyCardSubtitle1}
+            />
+            <Card
+              title={strings.privacyPolicyCardTitle2}
+              subtitle={strings.privacyPolicyCardSubtitle2}
+            />
+            <Card
+              title={strings.privacyPolicyCardTitle3}
+              subtitle={strings.privacyPolicyCardSubtitle3}
+            />
+            <Card
+              title={strings.privacyPolicyCardTitle4}
+              subtitle={strings.privacyPolicyCardSubtitle4}
+            />
+            <Card
+              title={strings.privacyPolicyCardTitle5}
+              subtitle={strings.privacyPolicyCardSubtitle5}
+            />
+            <Card
+              title={strings.privacyPolicyCardTitle6}
+              subtitle={strings.privacyPolicyCardSubtitle6}
+            />
+            <Card
+              title={strings.privacyPolicyCardTitle7}
+              subtitle={strings.privacyPolicyCardSubtitle7}
+            />
+            <Card
+              title={strings.privacyPolicyCardTitle8}
+              subtitle={strings.privacyPolicyCardSubtitle8}
+            />
+          </View>
         </ScrollView>
       </View>
     </Modal>

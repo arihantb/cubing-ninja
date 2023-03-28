@@ -9,7 +9,6 @@ import LanguageModal from './modals/LanguageModal';
 import AlgorithmsSettings from './components/AlgorithmsSettings';
 import GeneralSettings from './components/GeneralSettings';
 import TimerSettings from './components/TimerSettings';
-import styles from './styles/settingsStyle';
 import {
   toggleAlgorithmsSettingsVisibility,
   toggleGeneralSettingsVisibility,
@@ -42,37 +41,27 @@ const SettingsNavigation = () => {
       {isGeneralSettingsVisible && <GeneralSettings />}
       {isTimerSettingsVisible && <TimerSettings />}
       {isAlgorithmsSettingsVisible && <AlgorithmsSettings />}
-      <View style={styles.mainView}>
+      <View className="flex-1 p-8 bg-neutral-50 dark:bg-neutral-900">
         <Pressable
-          style={styles.copyDeviceInfo}
+          className="m-4"
           onPress={() => dispatch(toggleGeneralSettingsVisibility())}>
-          <Text style={styles.copyDeviceInfoTitle}>General</Text>
+          <Text>General</Text>
         </Pressable>
         <Pressable
-          style={styles.copyDeviceInfo}
+          className="m-4"
           onPress={() => dispatch(toggleTimerSettingsVisibility())}>
-          <Text style={styles.copyDeviceInfoTitle}>Timer</Text>
+          <Text>Timer</Text>
         </Pressable>
         <Pressable
-          style={styles.copyDeviceInfo}
+          className="m-4"
           onPress={() => dispatch(toggleAlgorithmsSettingsVisibility())}>
-          <Text style={styles.copyDeviceInfoTitle}>Algorithm</Text>
+          <Text>Algorithm</Text>
         </Pressable>
         <Pressable
-          style={{
-            margin: 15,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
+          className="m-4 flex-row items-center justify-center"
           onPress={() => dispatch(toggleLanguageModalVisibility())}>
-          <Text style={styles.copyDeviceInfoTitle}>Language</Text>
-          <View
-            style={{
-              marginRight: 20,
-              alignItems: 'flex-end',
-              justifyContent: 'center',
-            }}>
+          <Text>Language</Text>
+          <View className="mr-5 items-end justify-center">
             <Flag code={language} size={32} type="flat" />
           </View>
         </Pressable>

@@ -1,16 +1,21 @@
 import Modal from 'react-native-modal';
 import React, {memo, useState} from 'react';
-import {Switch} from 'react-native-elements';
-import {Pressable, View} from 'react-native';
-import {useDispatch} from 'react-redux';
+import {Pressable, Switch, View} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
 import {Header, Text} from '_components';
 import {strings} from '_data/strings';
-import {toggleGeneralSettingsVisibility} from '../redux/settingsSlice';
-import styles from '../styles/generalSettingsStyle';
+import {
+  toggleGeneralSettingsVisibility,
+  toggleStatusBarVisibility,
+} from '../redux/settingsSlice';
+import FullScreenChz from 'react-native-fullscreen-chz';
 
 const GeneralSettings = () => {
   const [visible, setVisible] = useState(true);
   const [swipeTabs, setSwipeTabs] = useState(true);
+  const isStatusBarVisible = useSelector(
+    state => state.settings.isStatusBarVisible,
+  );
 
   const dispatch = useDispatch();
 
@@ -22,31 +27,48 @@ const GeneralSettings = () => {
       animationIn="slideInRight"
       animationOut="slideOutRight"
       hasBackdrop={false}
-      style={{margin: 0}}
+      className="m-0"
       isVisible={visible}>
-      <View style={styles.mainView}>
-        <Header title={strings.generalSettingsTitle} setVisible={setVisible} />
-        <View style={styles.paddingLeft}>
-          <View style={styles.row}>
+      <View className="flex-1 bg-neutral-50 dark:bg-neutral-900">
+        <Header
+          title={strings.generalSettingsTitle}
+          backButtonAction={setVisible}
+        />
+        <View className="pl-14">
+          <View className="flex-row">
             <Pressable
-              style={styles.swipeTabs}
+              className="flex-1 m-4"
               onPress={() => {
                 // some action
               }}>
-              <Text style={styles.swipeTabsTitle}>
-                Allow swiping between tabs
-              </Text>
-              <Text style={styles.swipeTabsSubtitle}>
+              <Text className="mb-1 text-lg">Allow swiping between tabs</Text>
+              <Text>
                 If this is disabled, you&apos;ll have to tap the tabs to switch
                 between them
               </Text>
             </Pressable>
-            <View style={styles.swipeTabsSwitch}>
+            <View className="mr-5 justify-center">
               <Switch
                 val={swipeTabs}
                 onValueChange={val => setSwipeTabs(val)}
               />
             </View>
+          </View>
+          <View className="flex-row">
+            <View>
+              <Text className="mb-1 text-lg">Fullscreen</Text>
+              <Text>In fullscreen mode, hides the status bar</Text>
+            </View>
+            <Switch
+              className="flex-1"
+              isChecked={isStatusBarVisible}
+              onToggle={() => {
+                dispatch(toggleStatusBarVisibility());
+                isStatusBarVisible
+                  ? FullScreenChz.disable()
+                  : FullScreenChz.enable();
+              }}
+            />
           </View>
         </View>
       </View>

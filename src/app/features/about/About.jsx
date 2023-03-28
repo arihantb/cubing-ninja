@@ -9,7 +9,6 @@ import {strings} from '_data/strings';
 import {useDoubleBackTapToExit} from '_hooks/useDoubleBackTapToExit';
 import {togglePrivacyPolicyModalVisibility} from './redux/aboutSlice';
 import PrivacyPolicyModal from './modals/PrivacyPolicyModal';
-import styles from './styles/aboutStyle';
 import {togglePrivacyPolicyModalVisibilityFromModal} from './redux/privacyPolicyModalSlice';
 
 const About = () => {
@@ -116,9 +115,8 @@ const About = () => {
   return (
     <SafeAreaProvider>
       {isPrivacyPolicyModalVisible && <PrivacyPolicyModal />}
-      <View style={styles.mainView}>
+      <View className="flex-1 p-6 pl-12 gap-10 bg-white dark:bg-slate-800">
         <Pressable
-          style={styles.copyDeviceInfo}
           onPress={() => {
             ToastAndroid.show(
               strings.deviceInfoCopiedToast,
@@ -126,25 +124,18 @@ const About = () => {
             );
             _copyToClipboard();
           }}>
-          <Text style={styles.copyDeviceInfoTitle}>
-            {strings.copyDeviceInfoTitle}
-          </Text>
-          <Text style={styles.copyDeviceInfoSubtitle}>
-            {strings.copyDeviceInfoSubtitle}
-          </Text>
+          <Text className="mb-2 text-lg">{strings.copyDeviceInfoTitle}</Text>
+          <Text>{strings.copyDeviceInfoSubtitle}</Text>
         </Pressable>
         <Pressable
-          style={styles.privacyPolicy}
           onPress={() => {
             dispatch(togglePrivacyPolicyModalVisibility());
             dispatch(togglePrivacyPolicyModalVisibilityFromModal());
           }}>
-          <Text style={styles.privacyPolicyTitle}>
-            {strings.privacyPolicyTitle}
-          </Text>
+          <Text className="mb-2 text-lg">{strings.privacyPolicyTitle}</Text>
         </Pressable>
-        <Pressable style={styles.versionCheck} onPress={() => _checkVersion()}>
-          <Text style={styles.versionCheckTitle}>
+        <Pressable onPress={() => _checkVersion()}>
+          <Text className="mb-2 text-lg">
             {strings.versionCheckTitle} {version.toPrecision(1)}
           </Text>
         </Pressable>

@@ -7,7 +7,6 @@ import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 import {Header, Text} from '_components';
 import {strings} from '_data/strings';
-import {colors} from '_features/theme';
 import {setSolves as setSolvesFromSolvesScreen} from '../../timer/redux/solvesScreenSlice';
 import AlertTypeModal from '../modals/AlertTypeModal';
 import InspectionDurationModal from '../modals/InspectionDurationModal';
@@ -26,11 +25,11 @@ import {
   toggleInspectionDurationModalVisibility,
   toggleTimerSettingsVisibility,
 } from '../redux/settingsSlice';
-import styles from '../styles/timerSettingsStyle';
 import {sound, soundVibrate, vibrate} from '../../../assets/images';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faDownload, faUpload} from '@fortawesome/free-solid-svg-icons';
 import {getSolves, setSolves} from '../../../utils';
+import {Icon} from '../../../components';
+import {useHexColor} from '../../../hooks/useHexColor';
 
 const TimerSettings = () => {
   const timerSettings = useSelector(state => state.timerSettings.timerSettings);
@@ -60,7 +59,7 @@ const TimerSettings = () => {
                 ),
             );
           }}>
-          <FontAwesomeIcon icon={faUpload} size={20} color={colors.white} />
+          <Icon icon={faUpload} size={20} color="bg-neutral-50" />
         </Pressable>
       ),
       disabled: false,
@@ -85,7 +84,7 @@ const TimerSettings = () => {
                 );
               });
           }}>
-          <FontAwesomeIcon icon={faDownload} size={20} color={colors.white} />
+          <Icon icon={faDownload} size={20} color="bg-neutral-50" />
         </Pressable>
       ),
       disabled: false,
@@ -112,12 +111,11 @@ const TimerSettings = () => {
             dispatch(toggleInspectionDurationModalVisibility())
           }>
           <Text
-            style={[
+            className={`text-lg ${
               timerSettings.isInspectionEnabled
-                ? {color: colors.white}
-                : {color: colors.grey},
-              {fontSize: 18},
-            ]}>
+                ? 'text-neutral-50'
+                : 'text-neutral-400'
+            }`}>
             {timerSettings.inspectionDuration}s
           </Text>
         </Pressable>
@@ -156,12 +154,11 @@ const TimerSettings = () => {
                   ? sound
                   : vibrate,
             }}
+            className="h-8 w-8"
             style={{
               tintColor: timerSettings.alertOnInspectionTimeLeft
-                ? colors.white
-                : colors.grey,
-              width: 30,
-              height: 30,
+                ? useHexColor('bg-neutral-50')
+                : useHexColor('bg-neutral-400'),
             }}
           />
         </Pressable>
@@ -250,36 +247,27 @@ const TimerSettings = () => {
   ];
 
   const renderItem = ({item}) => (
-    <View style={styles.row}>
-      <View style={styles.swipeTabs}>
+    <View className="flex-row">
+      <View className="flex-1 m-3">
         <Text
-          style={[
-            item.disabled ? {color: colors.grey} : {color: colors.white},
-            styles.swipeTabsTitle,
-          ]}>
+          className={`mb-3 ${
+            item.disabled ? 'text-neutral-400' : 'text-neutral-50'
+          }`}>
           {item.title}
         </Text>
         <Text
-          style={[
-            item.disabled ? {color: colors.grey} : {color: colors.white},
-            styles.swipeTabsSubtitle,
-          ]}>
+          className={item.disabled ? 'text-neutral-400' : 'text-neutral-50'}>
           {item.subtitle}
         </Text>
       </View>
-      <View style={styles.swipeTabsSwitch}>{item.right}</View>
+      <View className="flex-1 mr-3 items-center justify-center">
+        {item.right}
+      </View>
     </View>
   );
 
   const renderSectionHeader = ({section}) => (
-    <Text
-      style={{
-        flex: 1,
-        fontSize: 16,
-        backgroundColor: colors.primary,
-        color: 'white',
-        padding: 10,
-      }}>
+    <Text className="flex-1 p-3 bg-neutral-50 dark:bg-neutral-900">
       {section.title}
     </Text>
   );
@@ -318,23 +306,26 @@ const TimerSettings = () => {
       animationIn="slideInRight"
       animationOut="slideOutRight"
       hasBackdrop={false}
-      style={{margin: 0}}
+      className="m-0"
       isVisible={visible}>
       {timerSettings.isAlertTypeModalVisible && <AlertTypeModal />}
       {timerSettings.isInspectionDurationModalVisible && (
         <InspectionDurationModal />
       )}
-      <View style={styles.mainView}>
-        <Header title={strings.timerSettingsTitle} hideModal={setVisible} />
+      <View className="flex-1 bg-neutral-50 dark:bg-neutral-900">
+        <Header
+          title={strings.timerSettingsTitle}
+          backButtonAction={setVisible}
+        />
         <SectionList
           itemDimension={100}
           itemContainerStyle={{alignItems: 'center'}}
-          stickySectionHeadersEnabled={true}
+          stickySectionHeadersEnabled
           initialNumToRender={20}
           sections={sections}
           renderItem={renderItem}
           renderSectionHeader={renderSectionHeader}
-          removeClippedSubviews={true}
+          removeClippedSubviews
           getItemLayout={(_, index) => ({
             length: 100,
             offset: 100 * index,

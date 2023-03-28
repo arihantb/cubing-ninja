@@ -3,6 +3,7 @@ module.exports = {
   rules: {
     'no-shadow': 'off',
   },
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 8,
     sourceType: 'module',

@@ -6,7 +6,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import Text from '_components';
 import {strings} from '_data/strings';
 import {constants} from '_data/constants';
-import {colors} from '_features/theme';
 import {
   setInspectionDuration,
   toggleInspectionDurationModalVisibility,
@@ -26,16 +25,16 @@ const InspectionDurationModal = props => {
     <Modal
       onBackdropPress={() => setVisible(false)}
       onBackButtonPress={() => setVisible(false)}
-      useNativeDriver={true}
-      useNativeDriverForBackdrop={true}
+      useNativeDriver
+      useNativeDriverForBackdrop
       onModalHide={() => dispatch(toggleInspectionDurationModalVisibility())}
       backdropTransitionOutTiming={0}
       isVisible={visible}>
       <View style={{justifyContent: 'center', alignItems: 'center'}}>
-        <View style={{backgroundColor: colors.lightgrey, borderRadius: 5}}>
+        <View style={{backgroundColor: '#D2D2D2', borderRadius: 5}}>
           <Text
             style={{
-              color: colors.black,
+              color: '#000000',
               fontSize: 16,
               marginTop: 10,
               alignSelf: 'center',
@@ -61,7 +60,7 @@ const InspectionDurationModal = props => {
                 error && dispatch(setInspectionDuration(parseInt(val)));
               }}
               inputContainerStyle={{
-                borderColor: error ? colors.red : colors.blue,
+                borderColor: error ? '#FF0000' : '#0000FF',
                 borderBottomWidth: 2,
               }}
               errorStyle={{

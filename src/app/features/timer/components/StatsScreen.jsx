@@ -11,7 +11,6 @@ import {View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {ImageMessage} from '_components';
 import {strings} from '_data/strings';
-import {colors} from '_features/theme';
 import {getTimeInMilliseconds, getTimeInString} from '../utils/formatTime';
 import {
   setAllSolves,
@@ -20,7 +19,6 @@ import {
   setPenaltySolves,
   toggleUpdateStatsStatus,
 } from '../redux/statsScreenSlice';
-import styles from '../styles/statsScreenStyle';
 
 const StatsScreen = () => {
   const allSolves = useSelector(state => state.statsScreen.allSolves);
@@ -142,8 +140,8 @@ const StatsScreen = () => {
 
     legend.push({
       name: 'All',
-      symbol: {fill: colors.white},
-      labels: {fill: colors.white, fontSize: 12},
+      symbol: {fill: '#FFFFFF'},
+      labels: {fill: '#FFFFFF', fontSize: 12},
     });
   }
 
@@ -156,8 +154,8 @@ const StatsScreen = () => {
 
     legend.push({
       name: 'Best',
-      symbol: {fill: colors.orange},
-      labels: {fill: colors.white, fontSize: 12},
+      symbol: {fill: '#FFFF00'},
+      labels: {fill: '#FFFFFF', fontSize: 12},
     });
   }
 
@@ -171,8 +169,8 @@ const StatsScreen = () => {
     if (ao12SolvesData.length !== 0) {
       legend.push({
         name: 'Ao12',
-        symbol: {fill: colors.green},
-        labels: {fill: colors.white, fontSize: 12},
+        symbol: {fill: '#00FF00'},
+        labels: {fill: '#FFFFFF', fontSize: 12},
       });
     }
   }
@@ -187,19 +185,17 @@ const StatsScreen = () => {
     if (penaltySolvesData.length !== 0) {
       legend.push({
         name: 'Penalty (+2)',
-        symbol: {fill: colors.red},
-        labels: {fill: colors.white, fontSize: 12},
+        symbol: {fill: '#FF0000'},
+        labels: {fill: '#FFFFFF', fontSize: 12},
       });
     }
   }
 
   return (
-    <View style={styles.mainContainer}>
+    <View className="flex-1 bg-neutral-50 dark:bg-neutral-900">
       <View
-        style={[
-          {paddingLeft: solvesData.length === 0 && 0},
-          styles.innerContainer,
-        ]}>
+        className="flex-1"
+        style={[{paddingLeft: solvesData.length === 0 && 0}]}>
         {solvesData.length === 0 ? (
           <ImageMessage message={strings.noSolves} />
         ) : (
@@ -209,7 +205,7 @@ const StatsScreen = () => {
               y: [Math.min(...allSolves) - 2000, Math.max(...allSolves) + 2000],
             }}>
             <VictoryAxis
-              dependentAxis={true}
+              dependentAxis
               tickFormat={(tick, _, ticks) =>
                 ticks.every(val => val < 60000)
                   ? getTimeInString(tick)
@@ -217,16 +213,16 @@ const StatsScreen = () => {
               }
               style={{
                 axis: {
-                  stroke: colors.white,
+                  stroke: '#FFFFFF',
                   strokeWidth: 1,
                 },
                 tickLabels: {
                   fontSize: 12,
-                  fill: colors.white,
+                  fill: '#FFFFFF',
                   padding: 15,
                 },
                 grid: {
-                  stroke: colors.white,
+                  stroke: '#FFFFFF',
                   strokeDasharray: 2,
                 },
               }}
@@ -235,12 +231,12 @@ const StatsScreen = () => {
               dependentAxis={false}
               style={{
                 axis: {
-                  stroke: colors.white,
+                  stroke: '#FFFFFF',
                   strokeWidth: 1,
                 },
                 tickLabels: {
                   fontSize: 12,
-                  fill: colors.white,
+                  fill: '#FFFFFF',
                   padding: 15,
                 },
                 grid: {
@@ -254,7 +250,7 @@ const StatsScreen = () => {
                 size={4}
                 style={{
                   data: {
-                    fill: colors.white,
+                    fill: '#FFFFFF',
                   },
                 }}
               />
@@ -263,7 +259,7 @@ const StatsScreen = () => {
                 data={solvesData}
                 style={{
                   data: {
-                    stroke: colors.white,
+                    stroke: '#FFFFFF',
                     strokeWidth: 2,
                   },
                 }}
@@ -273,7 +269,7 @@ const StatsScreen = () => {
               <VictoryLine
                 style={{
                   data: {
-                    stroke: colors.orange,
+                    stroke: '#FFFF00',
                     strokeWidth: 2,
                     strokeDasharray: 2,
                   },
@@ -283,7 +279,7 @@ const StatsScreen = () => {
                 size={4}
                 style={{
                   data: {
-                    fill: colors.orange,
+                    fill: '#FFFF00',
                   },
                 }}
               />
@@ -294,7 +290,7 @@ const StatsScreen = () => {
                 data={ao12SolvesData}
                 style={{
                   data: {
-                    fill: colors.green,
+                    fill: '#00FF00',
                   },
                 }}
               />
@@ -303,7 +299,7 @@ const StatsScreen = () => {
                 data={ao12SolvesData}
                 style={{
                   data: {
-                    stroke: colors.green,
+                    stroke: '#00FF00',
                     strokeWidth: 2,
                   },
                 }}
@@ -314,7 +310,7 @@ const StatsScreen = () => {
               size={4}
               style={{
                 data: {
-                  fill: colors.red,
+                  fill: '#FF0000',
                 },
               }}
             />

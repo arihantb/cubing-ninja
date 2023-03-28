@@ -1,40 +1,27 @@
 import React, {memo, useRef, useEffect} from 'react';
-import {ActivityIndicator, Animated, View} from 'react-native';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {Animated, View} from 'react-native';
 import {LinearProgress} from 'react-native-elements';
 import {SvgXml} from 'react-native-svg';
-import {
-  faBan,
-  faCommentAlt,
-  faFlag,
-  faTrash,
-  faUndo,
-} from '@fortawesome/free-solid-svg-icons';
 import {useDispatch, useSelector} from 'react-redux';
-import {Pressable, Text} from '_components';
+import {Text} from '_components';
 import {loadFromLocalStorage} from '_libs';
-import {colors} from '_features/theme';
 import Stopwatch from './Stopwatch';
-import CommentsModal from '../modals/CommentsModal';
 import ScrambleImageModal from '../modals/ScrambleImageModal';
 import {
   setLeftStats,
   setRightStats,
   setScrambleImageHeight,
   setScrambleTextHeight,
-  toggleCommentsModalVisibility,
   toggleScrambleImageModalVisibility,
 } from '../redux/timerScreenSlice';
-import styles from '../styles/timerScreenStyle';
 import {heightAnimOut, heightAnimIn} from '../../../utils/animations';
 import {getTimeInMilliseconds, getTimeInString} from '../utils/formatTime';
+import {useHexColor} from '../../../hooks/useHexColor';
+import {Loading} from '../../../components';
 
 const TimerScreen = () => {
   const heightAnim = useRef(new Animated.Value(100)).current;
 
-  const isCommentsModalVisible = useSelector(
-    state => state.timerScreen.isCommentsModalVisible,
-  );
   const isScrambleImageModalVisible = useSelector(
     state => state.timerScreen.isScrambleImageModalVisible,
   );
@@ -172,15 +159,17 @@ const TimerScreen = () => {
 
   useEffect(() => {
     isStopwatchOn ? heightAnimOut(heightAnim) : heightAnimIn(heightAnim);
-  }, [isStopwatchOn, heightAnim]);
+  }, [isStopwatchOn]);
+
+  const indigoHexColor = useHexColor('bg-indigo-500');
 
   return (
-    <View style={styles.timerView}>
+    <View className="flex-1 bg-neutral-50 dark:bg-neutral-900">
       {isScrambleImageModalVisible && <ScrambleImageModal />}
-      {isCommentsModalVisible && <CommentsModal />}
       <Stopwatch />
       {timerSettings.shouldGenerateScrambles && (
         <Animated.View
+          className="absolute flex-row top-0 p-4"
           style={[
             {
               transform: [
@@ -192,19 +181,21 @@ const TimerScreen = () => {
                 },
               ],
             },
-            styles.scrambleView,
           ]}
           onLayout={event =>
             dispatch(setScrambleTextHeight(event.nativeEvent.layout.height))
           }>
           {scrambleData.scrambleLoading ? (
-            <LinearProgress color={colors.blue} />
+            <LinearProgress color={indigoHexColor} />
           ) : (
-            <Text style={styles.scrambleText}>{scrambleData.scrambleText}</Text>
+            <Text className="flex-1 text-center">
+              {scrambleData.scrambleText}
+            </Text>
           )}
         </Animated.View>
       )}
       <Animated.View
+        className="absolute flex-row bottom-0 p-4"
         style={[
           {
             transform: [
@@ -216,16 +207,15 @@ const TimerScreen = () => {
               },
             ],
           },
-          styles.bottomView,
         ]}
         onLayout={event => {
           dispatch(setScrambleImageHeight(event.nativeEvent.layout.height));
         }}>
-        <Text style={styles.leftStats}>{leftStats}</Text>
+        <Text className="flex-1">{leftStats}</Text>
         {scrambleData.scrambleImage !== '' &&
           timerSettings.shouldGenerateScrambles &&
           (scrambleData.scrambleLoading ? (
-            <ActivityIndicator color={colors.blue} size="large" />
+            <Loading color="bg-indigo-500" size="large" />
           ) : (
             <SvgXml
               xml={scrambleData.scrambleImage}
@@ -234,7 +224,7 @@ const TimerScreen = () => {
               onPress={() => dispatch(toggleScrambleImageModalVisibility())}
             />
           ))}
-        <Text style={styles.rightStats}>{rightStats}</Text>
+        <Text className="flex-1 text-right">{rightStats}</Text>
       </Animated.View>
     </View>
   );

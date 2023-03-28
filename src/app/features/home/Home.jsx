@@ -6,10 +6,10 @@ import {
   Animated,
   NativeModules,
   Pressable,
-  View,
   StatusBar,
+  View,
 } from 'react-native';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {Icon} from '../../components';
 import {Input} from 'react-native-elements';
 import {NavigationContainer} from '@react-navigation/native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
@@ -17,7 +17,6 @@ import {createDrawerNavigator} from '@react-navigation/drawer';
 import {
   faArrowLeft,
   faBars,
-  faCaretDown,
   faEdit,
   faSearch,
   faShapes,
@@ -37,7 +36,6 @@ import {Donate} from '_features/donate';
 import {About} from '_features/about';
 import {NavigationDrawer} from '_features/layout';
 import {constants} from '_data/constants';
-import {colors} from '_features/theme';
 import {loadSettings} from '_libs';
 import SelectPuzzleModal from './modals/SelectPuzzleModal';
 import EditScrambleModal from './modals/EditScrambleModal';
@@ -61,17 +59,27 @@ import {
   setSelectedSolves,
   toggleSolvesSelectionMode,
 } from '../timer/redux/solvesScreenSlice';
-import styles from './styles/homeStyle';
 import {
   heightAnimIn,
   heightAnimOut,
   rotateAnimIn,
   rotateAnimOut,
 } from '../../utils/animations';
+import {styled, useColorScheme} from 'nativewind';
+import colors from '../../../../tailwind.config';
+import {useHexColor} from '../../hooks/useHexColor';
 
 const Drawer = createDrawerNavigator();
 
+const StyledStatusBar = styled(StatusBar, {
+  props: {
+    backgroundColor: true,
+  },
+});
+
 const Home = () => {
+  const {colorScheme} = useColorScheme();
+
   const heightAnim = useRef(new Animated.Value(100)).current;
   const rotationAnim = useRef(new Animated.Value(0)).current;
 
@@ -102,27 +110,33 @@ const Home = () => {
     state => state.home.timerScreenHeaderIconIndex,
   );
   const timerSettings = useSelector(state => state.timerSettings.timerSettings);
+  const isStatusBarVisible = useSelector(
+    state => state.settings.isStatusBarVisible,
+  );
 
-  const setScrambleTextCallback = useCallback(async scrambleText => {
-    try {
-      if (scrambleText.length !== 0) {
-        const scrambleImage =
-          await NativeModules.ScrambleModule.getScrambleImage(
-            constants.puzzles[puzzle],
-            scrambleText,
+  const setScrambleTextCallback = useCallback(
+    async scrambleText => {
+      try {
+        if (scrambleText.length !== 0) {
+          const scrambleImage =
+            await NativeModules.ScrambleModule.getScrambleImage(
+              constants.puzzles[puzzle],
+              scrambleText,
+            );
+          dispatch(
+            setScrambleData({
+              scrambleText: scrambleText,
+              scrambleImage: base64.decode(scrambleImage),
+              scrambleLoading: false,
+            }),
           );
-        dispatch(
-          setScrambleData({
-            scrambleText: scrambleText,
-            scrambleImage: base64.decode(scrambleImage),
-            scrambleLoading: false,
-          }),
-        );
+        }
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
+    },
+    [dispatch, puzzle],
+  );
 
   const dispatch = useDispatch();
 
@@ -152,27 +166,31 @@ const Home = () => {
 
   const _timerScreenHeaderIcons = [
     timerSettings.shouldGenerateScrambles && !scrambleData.scrambleLoading && (
-      <View key={0} style={styles.timerScreenHeaderIcons}>
+      <View key={0} className="flex-row p-4 gap-6">
         <Pressable
           onPress={() => {
             dispatch(toggleEditScrambleModalVisibility());
             dispatch(toggleEditScrambleModalVisibilityFromModal());
           }}>
-          <View style={styles.centerIcon}>
-            <FontAwesomeIcon icon={faEdit} color={colors.white} size={20} />
-          </View>
+          <Icon
+            icon={faEdit}
+            color="bg-neutral-900 dark:bg-neutral-50"
+            size={20}
+          />
         </Pressable>
         <Pressable onPress={_fetchScramble}>
-          <View style={styles.centerIcon}>
-            <FontAwesomeIcon icon={faSyncAlt} color={colors.white} size={20} />
-          </View>
+          <Icon
+            icon={faSyncAlt}
+            color="bg-neutral-900 dark:bg-neutral-50"
+            size={20}
+          />
         </Pressable>
       </View>
     ),
-    <View key={1} style={styles.solvesScreenHeaderIcons}>
+    <>
       {isSortOptionsModalVisible && <SortOptionsModal />}
       {!isSearchBarVisible && !isDeleteHeaderIconVisible && (
-        <View style={styles.searchBarHeaderIcons}>
+        <View className="p-4 gap-6 flex-row">
           <Pressable
             onPress={() => {
               dispatch(toggleSortOptionsModalVisibility());
@@ -190,46 +208,53 @@ const Home = () => {
                     },
                   ],
                 },
-                styles.centerIcon,
               ]}>
-              <FontAwesomeIcon
+              <Icon
                 icon={faSortAmountDown}
-                color={colors.white}
+                color="bg-neutral-900 dark:bg-neutral-50"
                 size={20}
               />
             </Animated.View>
           </Pressable>
           <Pressable onPress={() => dispatch(toggleSearchBarVisibility())}>
-            <View style={styles.centerIcon}>
-              <FontAwesomeIcon icon={faSearch} color={colors.white} size={20} />
-            </View>
+            <Icon
+              icon={faSearch}
+              color="bg-neutral-900 dark:bg-neutral-50"
+              size={20}
+            />
           </Pressable>
         </View>
       )}
       {isDeleteHeaderIconVisible && (
-        <Pressable
-          onPress={() => {
-            dispatch(deleteSelectedSolves());
-            dispatch(toggleDeleteHeaderIconVisibility());
-            dispatch(toggleSolvesSelectionMode());
-          }}>
-          <View style={styles.centerIcon}>
-            <FontAwesomeIcon icon={faTrash} color={colors.white} size={20} />
-          </View>
-        </Pressable>
+        <View className="p-4">
+          <Pressable
+            onPress={() => {
+              dispatch(deleteSelectedSolves());
+              dispatch(toggleDeleteHeaderIconVisibility());
+              dispatch(toggleSolvesSelectionMode());
+            }}>
+            <Icon
+              icon={faTrash}
+              color="bg-neutral-900 dark:bg-neutral-50"
+              size={20}
+            />
+          </Pressable>
+        </View>
       )}
-    </View>,
+    </>,
   ];
 
   const _headerIcons = [
     _timerScreenHeaderIcons[timerScreenHeaderIconIndex],
-    <Pressable
-      key={1}
-      onPress={() => dispatch(toggleSelectAlgorithmsVisibility())}>
-      <View style={styles.centerIcon}>
-        <FontAwesomeIcon icon={faShapes} color={colors.white} size={20} />
-      </View>
-    </Pressable>,
+    <View key={0} className="p-4">
+      <Pressable onPress={() => dispatch(toggleSelectAlgorithmsVisibility())}>
+        <Icon
+          icon={faShapes}
+          color="bg-neutral-900 dark:bg-neutral-50"
+          size={20}
+        />
+      </Pressable>
+    </View>,
     null,
     null,
     null,
@@ -244,30 +269,22 @@ const Home = () => {
       onPress={() => {
         dispatch(toggleSelectPuzzleModalVisibility());
         dispatch(toggleSelectPuzzleModalVisibilityFromModal());
-      }}
-      style={styles.puzzleView}>
-      <Text style={styles.puzzleText}>{constants.puzzles[puzzle]}</Text>
-      <FontAwesomeIcon icon={faCaretDown} color={colors.white} />
+      }}>
+      <Text className="text-2xl text-indigo-500">
+        {constants.puzzles[puzzle]}
+      </Text>
     </Pressable>
   );
 
   const _searchBarTitle = () => (
-    <View
-      style={[
-        {
-          marginLeft: isDeleteHeaderIconVisible && 60,
-          marginBottom: isDeleteHeaderIconVisible && 5,
-          marginRight: isDeleteHeaderIconVisible && 50,
-        },
-        styles.searchTextView,
-      ]}>
+    <View className="flex-row ml-10 justify-center">
       {isDeleteHeaderIconVisible ? (
-        <Text style={styles.searchText}>{searchText}</Text>
+        <Text className="text-xl text-white">{searchText}</Text>
       ) : (
         <Input
-          inputStyle={styles.searchInput}
+          inputStyle="pb-0 text-lg text-white [font-family:GoogleSans-Bold]"
           onChangeText={val => dispatch(setSearchText(val))}
-          inputContainerStyle={styles.inputContainer}
+          inputContainerStyle="border-b-2 border-indigo-500"
           placeholder="Search for notes"
         />
       )}
@@ -279,80 +296,84 @@ const Home = () => {
     _puzzleTitle(),
     _puzzleTitle(),
     _puzzleTitle(),
-    <Text key={'appThemeScreenHeaderTitle'} style={styles.titleText}>
-      Home Theme
+    <Text key={'appThemeScreenHeaderTitle'} className="text-2xl">
+      Theme
     </Text>,
-    <Text key={'settingsScreenHeaderTitle'} style={styles.titleText}>
+    <Text key={'settingsScreenHeaderTitle'} className="text-2xl">
       Settings
     </Text>,
-    <Text key={'donateScreenHeaderTitle'} style={styles.titleText}>
+    <Text key={'donateScreenHeaderTitle'} className="text-2xl">
       Donate
     </Text>,
-    <Text key={'aboutScreenHeaderTitle'} style={styles.titleText}>
+    <Text key={'aboutScreenHeaderTitle'} className="text-2xl">
       About
     </Text>,
   ];
 
   const _header = props => (
-    <View style={{backgroundColor: colors.secondary}}>
-      <Animated.View
-        style={[
-          {
-            transform: [
-              {
-                translateY: heightAnim.interpolate({
-                  inputRange: [0, 100],
-                  outputRange: [-55, 0],
-                }),
-              },
-            ],
-          },
-          styles.headerIconsAnimatedView,
-        ]}>
-        <View style={styles.headerTitle}>{_headerTitles[drawerItemIndex]}</View>
-        <View style={styles.headerLeftIcons}>
-          {isDeleteHeaderIconVisible ? (
-            <Pressable
-              onPress={() => {
-                dispatch(setSearchText(''));
-                dispatch(setSelectedSolves([]));
-                dispatch(toggleDeleteHeaderIconVisibility());
-              }}>
-              <View style={styles.centerIcon}>
-                <FontAwesomeIcon
-                  icon={faArrowLeft}
-                  color={colors.white}
-                  size={20}
-                />
-              </View>
-            </Pressable>
-          ) : isSearchBarVisible ? (
-            <View
-              onStartShouldSetResponder={() => {
-                dispatch(setSearchText(''));
-                dispatch(toggleSearchBarVisibility());
-              }}>
-              <View style={styles.centerIcon}>
-                <FontAwesomeIcon
-                  icon={faArrowLeft}
-                  color={colors.white}
-                  size={20}
-                />
-              </View>
+    <Animated.View
+      className="bg-neutral-100 dark:bg-neutral-800 shadow-lg shadow-neutral-900 dark:shadow-none"
+      style={[
+        {
+          transform: [
+            {
+              translateY: heightAnim.interpolate({
+                inputRange: [0, 100],
+                outputRange: [-55, 0],
+              }),
+            },
+          ],
+        },
+      ]}>
+      <View className="p-4 items-center justify-center">
+        {_headerTitles[drawerItemIndex]}
+      </View>
+      <View className="absolute left-0 top-0 bottom-0 items-center justify-center">
+        {isDeleteHeaderIconVisible ? (
+          <Pressable
+            onPress={() => {
+              dispatch(setSearchText(''));
+              dispatch(setSelectedSolves([]));
+              dispatch(toggleDeleteHeaderIconVisibility());
+            }}>
+            <View className="p-4">
+              <Icon
+                icon={faArrowLeft}
+                color="bg-neutral-900 dark:bg-neutral-50"
+                size={20}
+              />
             </View>
-          ) : (
-            <Pressable onPress={props.navigation.openDrawer}>
-              <View style={styles.centerIcon}>
-                <FontAwesomeIcon icon={faBars} color={colors.white} size={20} />
-              </View>
-            </Pressable>
-          )}
-        </View>
-        <View style={styles.headerRightIcons}>
-          {_headerIcons[drawerItemIndex]}
-        </View>
-      </Animated.View>
-    </View>
+          </Pressable>
+        ) : isSearchBarVisible ? (
+          <Pressable
+            onPress={() => {
+              dispatch(setSearchText(''));
+              dispatch(toggleSearchBarVisibility());
+            }}>
+            <View className="p-4">
+              <Icon
+                icon={faArrowLeft}
+                color="bg-neutral-900 dark:bg-neutral-50"
+                size={20}
+              />
+            </View>
+          </Pressable>
+        ) : (
+          <Pressable onPress={props.navigation.openDrawer}>
+            <View className="p-4">
+              <Icon
+                icon={faBars}
+                color="bg-neutral-900 dark:bg-neutral-50"
+                size={20}
+              />
+            </View>
+          </Pressable>
+        )}
+      </View>
+      <View className="absolute right-0 top-0 bottom-0 items-center justify-center">
+        {_headerIcons[drawerItemIndex]}
+      </View>
+    </Animated.View>
   );
 
   const _drawerScreens = [
@@ -376,7 +397,7 @@ const Home = () => {
     solvesSortOption.sortOrder === 'Ascending'
       ? rotateAnimIn(rotationAnim)
       : rotateAnimOut(rotationAnim);
-  }, [solvesSortOption, rotationAnim]);
+  }, [solvesSortOption]);
 
   useEffect(() => {
     loadSettings({timerSettings: timerSettings}).then(settings => {
@@ -390,28 +411,31 @@ const Home = () => {
 
   return (
     <SafeAreaProvider>
-      {isSelectPuzzleModalVisible && <SelectPuzzleModal />}
-      {isEditScrambleModalVisible && (
-        <EditScrambleModal setScrambleText={setScrambleTextCallback} />
-      )}
-      <StatusBar hidden={false} backgroundColor={colors.primary} />
-      <NavigationContainer onReady={() => SplashScreen.hide()}>
-        <Drawer.Navigator
-          initialRouteName="Timer"
-          drawerContent={props => _navigationDrawer(props)}
-          screenOptions={{
-            swipeEnabled: false,
-            header: props => _header(props),
-          }}>
-          {_drawerScreens.map((screen, idx) => (
-            <Drawer.Screen
-              key={idx}
-              name={screen.name}
-              component={screen.component}
-            />
-          ))}
-        </Drawer.Navigator>
-      </NavigationContainer>
+      <View className="flex-1">
+        {isSelectPuzzleModalVisible && <SelectPuzzleModal />}
+        {isEditScrambleModalVisible && <EditScrambleModal />}
+        <StatusBar
+          hidden={true}
+          backgroundColor={useHexColor('bg-neutral-50 dark:bg-neutral-800')}
+        />
+        <NavigationContainer onReady={() => SplashScreen.hide()}>
+          <Drawer.Navigator
+            initialRouteName="timer"
+            drawerContent={props => _navigationDrawer(props)}
+            screenOptions={{
+              swipeEnabled: false,
+              header: props => _header(props),
+            }}>
+            {_drawerScreens.map((screen, idx) => (
+              <Drawer.Screen
+                key={idx}
+                name={screen.name}
+                component={screen.component}
+              />
+            ))}
+          </Drawer.Navigator>
+        </NavigationContainer>
+      </View>
     </SafeAreaProvider>
   );
 };
