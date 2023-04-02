@@ -1,8 +1,9 @@
-import React, {memo, useEffect, useRef} from 'react';
+import React, {memo, useEffect} from 'react';
 import moment from 'moment';
 import uuid from 'react-native-uuid';
-import {Animated, Pressable, View} from 'react-native';
+import {Pressable, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
+import {Text} from '_components';
 import {constants} from '_data/constants';
 import {saveToLocalStorage} from '_libs';
 import {addToSolves} from '../redux/solvesScreenSlice';
@@ -19,17 +20,16 @@ import {
   toggleResetTimerStatus,
   toggleTimerOnStatus,
 } from '../redux/stopwatchSlice';
-import {fontSizeAnimIn, fontSizeAnimOut} from '../../../utils/animations';
 import {
   getDigit,
   getTimeInMilliseconds,
   getTimeInString,
 } from '../utils/formatTime';
-import {useHexColor} from '../../../hooks/useHexColor';
+import {useHexColor} from '_hooks';
+import {View as MotiView} from 'moti';
+import {useDerivedValue} from 'react-native-reanimated';
 
 const Stopwatch = () => {
-  const fontSizeAnim = useRef(new Animated.Value(80)).current;
-
   const inspectionPenalty = useSelector(
     state => state.stopwatch.inspectionPenalty,
   );
@@ -53,6 +53,9 @@ const Stopwatch = () => {
   const dispatch = useDispatch();
 
   const duration = moment.duration(time);
+  const greenColor = useHexColor('bg-green-500');
+  const redColor = useHexColor('bg-red-500');
+  const neutralColor = useHexColor('bg-neutral-50');
 
   const _getTime = () => {
     let timeInString =
@@ -102,7 +105,6 @@ const Stopwatch = () => {
       className="flex-1 flex-row"
       onPress={() => {
         dispatch(toggleTimerOnStatus());
-        fontSizeAnimOut(fontSizeAnim);
         _storeSolve();
         dispatch(toggleRefreshScrambleStatus());
       }}>
@@ -125,7 +127,6 @@ const Stopwatch = () => {
 
         if (pressTime > 500) {
           dispatch(toggleTimerOnStatus());
-          fontSizeAnimIn(fontSizeAnim);
           dispatch(toggleInspectionTimerOnStatus());
           dispatch(setInspectionTime(timerSettings.inspectionDuration));
         } else {
@@ -162,7 +163,6 @@ const Stopwatch = () => {
 
         if (pressTime > 500) {
           dispatch(toggleTimerOnStatus());
-          fontSizeAnimIn(fontSizeAnim);
           dispatch(setInspectionPenalty(''));
         } else {
           dispatch(setPressTime(0));
@@ -184,50 +184,46 @@ const Stopwatch = () => {
       : _pressableComponentWhenTimerOffAndInspectionNotEnabled(children);
   };
 
+  const scale = useDerivedValue(() => (isStopwatchOn ? 1.5 : 1));
+
   const _formatTimer = (children, key) => (
-    <Animated.Text
-      key={key}
-      style={[
-        {
-          width:
-            (key !== 2 &&
-              key !== 5 &&
-              fontSizeAnim.interpolate({
-                inputRange: [80, 100],
-                outputRange: [40, 50],
-              })) ||
-            'auto',
-          color:
-            pressTime > 0 && !isStopwatchOn
-              ? pressTime > 500
-                ? useHexColor('bg-green-500')
-                : useHexColor('bg-red-500')
-              : useHexColor('bg-neutral-50'),
-          fontSize: fontSizeAnim,
-        },
-      ]}>
-      {children}
-    </Animated.Text>
+    <View key={key} className="flex-row items-center justify-center">
+      <Text
+        className="text-7xl text-center"
+        style={[
+          {
+            width: (key !== 2 && key !== 5 && 38) || 'auto',
+            color:
+              pressTime > 0 && !isStopwatchOn
+                ? pressTime > 500
+                  ? greenColor
+                  : redColor
+                : neutralColor,
+          },
+        ]}>
+        {children}
+      </Text>
+    </View>
   );
 
   const _renderTimer = () => {
     if (inspectionPenalty === 'DNF') {
       return (
-        <View className="flex-1 flex-row items-center justify-center">
-          <Animated.Text
+        <View className="flex-row items-center justify-center">
+          <Text
+            className="text-7xl"
             style={[
               {
                 color:
                   pressTime > 0 && !isStopwatchOn
                     ? pressTime > 500
-                      ? useHexColor('bg-green-500')
-                      : useHexColor('bg-red-500')
-                    : useHexColor('bg-neutral-50'),
-                fontSize: fontSizeAnim,
+                      ? greenColor
+                      : redColor
+                    : neutralColor,
               },
             ]}>
             DNF
-          </Animated.Text>
+          </Text>
         </View>
       );
     }
@@ -262,20 +258,20 @@ const Stopwatch = () => {
 
   const _renderInspectionTimer = () => (
     <View className="flex-1 flex-row items-center justify-center">
-      <Animated.Text
+      <Text
+        className="text-7xl"
         style={[
           {
             color:
               pressTime > 0
                 ? pressTime > 500
-                  ? useHexColor('bg-green-500')
-                  : useHexColor('bg-red-500')
-                : useHexColor('bg-neutral-50'),
-            fontSize: fontSizeAnim,
+                  ? greenColor
+                  : redColor
+                : neutralColor,
           },
         ]}>
         {inspectionPenalty === '' ? inspectionTime : inspectionPenalty}
-      </Animated.Text>
+      </Text>
     </View>
   );
 
@@ -355,7 +351,10 @@ const Stopwatch = () => {
   }
 
   return (
-    <View className="flex-1 items-center justify-center">
+    <MotiView
+      className="flex-1 bg-neutral-50 dark:bg-neutral-900 items-center justify-center"
+      animate={useDerivedValue(() => ({scale: scale.value}))}
+      transition={{type: 'timing', duration: 200}}>
       {_pressableComponent(
         timerSettings.isInspectionEnabled &&
           isInspectionTimerOn &&
@@ -363,7 +362,7 @@ const Stopwatch = () => {
           ? _renderInspectionTimer()
           : _renderTimer(),
       )}
-    </View>
+    </MotiView>
   );
 };
 

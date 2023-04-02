@@ -4,11 +4,7 @@ import {Pressable, Switch, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {Header, Text} from '_components';
 import {strings} from '_data/strings';
-import {
-  toggleGeneralSettingsVisibility,
-  toggleStatusBarVisibility,
-} from '../redux/settingsSlice';
-import FullScreenChz from 'react-native-fullscreen-chz';
+import {toggleGeneralSettingsVisibility} from '../redux/settingsSlice';
 
 const GeneralSettings = () => {
   const [visible, setVisible] = useState(true);
@@ -30,10 +26,7 @@ const GeneralSettings = () => {
       className="m-0"
       isVisible={visible}>
       <View className="flex-1 bg-neutral-50 dark:bg-neutral-900">
-        <Header
-          title={strings.generalSettingsTitle}
-          backButtonAction={setVisible}
-        />
+        <Header title={strings.generalSettingsTitle} onClose={setVisible} />
         <View className="pl-14">
           <View className="flex-row">
             <Pressable
@@ -61,13 +54,8 @@ const GeneralSettings = () => {
             </View>
             <Switch
               className="flex-1"
-              isChecked={isStatusBarVisible}
-              onToggle={() => {
-                dispatch(toggleStatusBarVisibility());
-                isStatusBarVisible
-                  ? FullScreenChz.disable()
-                  : FullScreenChz.enable();
-              }}
+              value={isStatusBarVisible}
+              onValueChange={() => {}}
             />
           </View>
         </View>

@@ -54,14 +54,14 @@ const SortOptionsModal = () => {
           <Text
             className={`p-2 text-lg text-center ${
               solvesSortOption.sortBy === 'Date'
-                ? 'text-white'
-                : 'text-slate-900'
+                ? 'text-neutral-50'
+                : 'text-neutral-900'
             }
             
               ${
                 solvesSortOption.sortBy === 'Date'
                   ? 'bg-indigo-500'
-                  : 'bg-white'
+                  : 'bg-neutral-50'
               }`}>
             {strings.date}
           </Text>
@@ -84,14 +84,14 @@ const SortOptionsModal = () => {
           <Text
             className={`p-2 text-lg text-center ${
               solvesSortOption.sortBy === 'Solve Time'
-                ? 'text-white'
-                : 'text-slate-900'
+                ? 'text-neutral-50'
+                : 'text-neutral-900'
             }
             
               ${
                 solvesSortOption.sortBy === 'Solve Time'
                   ? 'bg-indigo-500'
-                  : 'bg-white'
+                  : 'bg-neutral-50'
               }`}>
             {strings.solveTime}
           </Text>

@@ -38,8 +38,8 @@ const _puzzleMap = puzzle => {
  */
 const PuzzlePlayer = ({puzzle, alg, setupAlg, mask, ...props}) => (
   <WebView
+    className="bg-neutral-500"
     javaScriptEnabled
-    className="bg-gray-300 dark:bg-slate-500"
     startInLoadingState
     source={{
       html:

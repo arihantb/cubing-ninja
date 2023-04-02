@@ -103,7 +103,6 @@ const EditProfile = () => {
       animationOut="slideOutRight"
       hasBackdrop={false}
       className="m-0"
-      statusBarTranslucent
       isVisible={isEditProfileVisible}>
       {isChangeEmailModalVisible && <ChangeEmailModal />}
       {isChangePasswordModalVisible && <ChangePasswordModal />}

@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import React, {memo, useEffect, useRef} from 'react';
-import {Animated, Pressable, View} from 'react-native';
+import React, {memo} from 'react';
+import {Dimensions, Pressable, View} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {
@@ -17,14 +17,13 @@ import {
   setTimerScreenHeaderIconIndex,
   toggleSearchBarVisibility,
 } from '../home/redux/homeSlice';
-import {heightAnimIn, heightAnimOut} from '../../utils/animations';
 import {Icon} from '../../components';
+import {AnimatePresence, View as MotiView} from 'moti';
+import {FadeInDown, FadeOutDown, Layout} from 'react-native-reanimated';
 
 const Tab = createMaterialTopTabNavigator();
 
 const Timer = () => {
-  const heightAnim = useRef(new Animated.Value(100)).current;
-
   const isSearchBarVisible = useSelector(
     state => state.home.isSearchBarVisible,
   );
@@ -32,90 +31,91 @@ const Timer = () => {
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    isStopwatchOn ? heightAnimOut(heightAnim) : heightAnimIn(heightAnim);
-  }, [isStopwatchOn]);
-
   const timerTab = props => (
-    <Animated.View
-      className="bg-neutral-50 dark:bg-neutral-800"
-      style={[
-        {
-          transform: [
-            {
-              translateY: heightAnim.interpolate({
-                inputRange: [0, 100],
-                outputRange: [55, 0],
-              }),
-            },
-          ],
-        },
-      ]}>
-      <View className="flex-row">
-        <Pressable
-          className={`flex-1 p-4 items-center justify-center border-t-2 ${
-            props.state.index === 0 ? 'border-indigo-500' : 'border-transparent'
-          }`}
-          onPress={() => {
-            if (isSearchBarVisible) {
-              dispatch(toggleSearchBarVisibility());
-            }
+    <AnimatePresence>
+      {!isStopwatchOn && (
+        <MotiView
+          from={{opacity: 0}}
+          animate={{opacity: 1}}
+          exit={{opacity: 0}}
+          layout={Layout}
+          transition={{type: 'timing'}}
+          className="bg-neutral-50 dark:bg-neutral-800">
+          <View
+            pointerEvents={isStopwatchOn ? 'none' : 'auto'}
+            className="flex-row">
+            <Pressable
+              className={`flex-1 p-4 items-center justify-center border-t-2 ${
+                props.state.index === 0
+                  ? 'border-indigo-500'
+                  : 'border-transparent'
+              }`}
+              onPress={() => {
+                if (isSearchBarVisible) {
+                  dispatch(toggleSearchBarVisibility());
+                }
 
-            dispatch(setTimerScreenHeaderIconIndex(0));
-            props.navigation.navigate('timerScreen');
-          }}>
-          <Icon
-            icon={faStopwatch}
-            color={
-              props.state.index === 0
-                ? 'bg-indigo-500'
-                : 'bg-neutral-900 dark:bg-neutral-50'
-            }
-            size={20}
-          />
-        </Pressable>
-        <Pressable
-          className={`flex-1 p-4 items-center justify-center border-t-2 ${
-            props.state.index === 1 ? 'border-indigo-500' : 'border-transparent'
-          }`}
-          onPress={() => {
-            dispatch(setTimerScreenHeaderIconIndex(1));
-            props.navigation.navigate('solvesScreen');
-          }}>
-          <Icon
-            icon={faListAlt}
-            color={
-              props.state.index === 1
-                ? 'bg-indigo-500'
-                : 'bg-neutral-900 dark:bg-neutral-50'
-            }
-            size={20}
-          />
-        </Pressable>
-        <Pressable
-          className={`flex-1 p-4 items-center justify-center border-t-2 ${
-            props.state.index === 2 ? 'border-indigo-500' : 'border-transparent'
-          }`}
-          onPress={() => {
-            if (isSearchBarVisible) {
-              dispatch(toggleSearchBarVisibility());
-            }
+                dispatch(setTimerScreenHeaderIconIndex(0));
+                props.navigation.navigate('timerScreen');
+              }}>
+              <Icon
+                icon={faStopwatch}
+                color={
+                  props.state.index === 0
+                    ? 'bg-indigo-500'
+                    : 'bg-neutral-900 dark:bg-neutral-50'
+                }
+                size={20}
+              />
+            </Pressable>
+            <Pressable
+              className={`flex-1 p-4 items-center justify-center border-t-2 ${
+                props.state.index === 1
+                  ? 'border-indigo-500'
+                  : 'border-transparent'
+              }`}
+              onPress={() => {
+                dispatch(setTimerScreenHeaderIconIndex(1));
+                props.navigation.navigate('solvesScreen');
+              }}>
+              <Icon
+                icon={faListAlt}
+                color={
+                  props.state.index === 1
+                    ? 'bg-indigo-500'
+                    : 'bg-neutral-900 dark:bg-neutral-50'
+                }
+                size={20}
+              />
+            </Pressable>
+            <Pressable
+              className={`flex-1 p-4 items-center justify-center border-t-2 ${
+                props.state.index === 2
+                  ? 'border-indigo-500'
+                  : 'border-transparent'
+              }`}
+              onPress={() => {
+                if (isSearchBarVisible) {
+                  dispatch(toggleSearchBarVisibility());
+                }
 
-            dispatch(setTimerScreenHeaderIconIndex(2));
-            props.navigation.navigate('statsScreen');
-          }}>
-          <Icon
-            icon={faChartLine}
-            color={
-              props.state.index === 2
-                ? 'bg-indigo-500'
-                : 'bg-neutral-900 dark:bg-neutral-50'
-            }
-            size={20}
-          />
-        </Pressable>
-      </View>
-    </Animated.View>
+                dispatch(setTimerScreenHeaderIconIndex(2));
+                props.navigation.navigate('statsScreen');
+              }}>
+              <Icon
+                icon={faChartLine}
+                color={
+                  props.state.index === 2
+                    ? 'bg-indigo-500'
+                    : 'bg-neutral-900 dark:bg-neutral-50'
+                }
+                size={20}
+              />
+            </Pressable>
+          </View>
+        </MotiView>
+      )}
+    </AnimatePresence>
   );
 
   useDoubleBackTapToExit();
@@ -129,6 +129,7 @@ const Timer = () => {
           headerShown: false,
           swipeEnabled: false,
         }}
+        className="bg-neutral-50 dark:bg-neutral-900"
         tabBarPosition="bottom">
         <Tab.Screen name="timerScreen" component={TimerScreen} />
         <Tab.Screen name="solvesScreen" component={SolvesScreen} />

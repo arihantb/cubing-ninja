@@ -21,7 +21,7 @@ const Header = ({title, onClose, ...props}) => (
         size={20}
       />
     </Pressable>
-    <View className="pl-5 justify-center">
+    <View className="justify-center">
       <Text className="text-2xl">{title}</Text>
     </View>
   </View>

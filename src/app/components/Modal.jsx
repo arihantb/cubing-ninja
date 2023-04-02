@@ -18,21 +18,20 @@ const Modal = ({onClose, onHide, title, children, ...props}) => (
     onModalHide={onHide}
     className="m-0"
     hideModalContentWhileAnimating
-    swipeDirection="down"
     propagateSwipe
     onSwipeComplete={onClose}
     {...props}>
     <View className="flex-1 mt-20 items-center justify-center">
-      <View className="flex-1 p-4 rounded-t-xl justify-between w-full bg-neutral-50 dark:bg-neutral-800">
-        <View className="flex-row items-center">
+      <View className="flex-1 overflow-hidden rounded-t-xl justify-between w-full bg-neutral-50 dark:bg-neutral-800">
+        <View className="flex-row p-4 items-center bg-neutral-50 dark:bg-neutral-700 shadow-xl shadow-neutral-50 dark:shadow-none">
           <Text className="absolute left-0 right-0 justify-center text-xl text-center">
             {title}
           </Text>
           <Pressable onPress={onClose}>
-            <Text className="text-lg text-red-500">{strings.cancel}</Text>
+            <Text className="text-lg text-red-500">{strings.close}</Text>
           </Pressable>
         </View>
-        {children}
+        <View className="flex-1 px-4">{children}</View>
       </View>
     </View>
   </RNModal>

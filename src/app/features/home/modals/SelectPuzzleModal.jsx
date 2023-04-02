@@ -98,7 +98,7 @@ const SelectPuzzleModal = () => {
       }}>
       <View
         className={`p-3 rounded-md items-center ${
-          puzzle === item.puzzle ? 'bg-slate-900' : 'bg-slate-700'
+          puzzle === item.puzzle ? 'bg-neutral-900' : 'bg-neutral-700'
         }`}>
         <Image className="h-10 w-10" source={{uri: item.image}} />
         <Text

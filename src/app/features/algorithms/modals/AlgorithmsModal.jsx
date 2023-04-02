@@ -37,7 +37,7 @@ const AlgorithmsModal = props => {
       <Pressable
         key={idx}
         className={`p-2 ${
-          selectedAlgorithmIndex === idx ? 'bg-slate-900' : 'bg-slate-700'
+          selectedAlgorithmIndex === idx ? 'bg-neutral-900' : 'bg-neutral-700'
         }`}
         onPress={() => dispatch(setSelectedAlgorithmIndex(idx))}>
         <Text
@@ -63,7 +63,7 @@ const AlgorithmsModal = props => {
       backdropTransitionOutTiming={0}
       isVisible={isAlgorithmsModalVisible}>
       <View className="flex-1 items-center justify-center">
-        <View className="w-3/4 rounded-md bg-white dark:bg-slate-800">
+        <View className="w-3/4 rounded-md bg-neutral-50 dark:bg-neutral-800">
           <Text className="m-1 text-lg text-center">
             {selectedAlgorithm.name}
           </Text>

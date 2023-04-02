@@ -3,8 +3,7 @@ import {createSlice} from '@reduxjs/toolkit';
 const initialState = {
   isCommentsModalVisible: false,
   isScrambleImageModalVisible: false,
-  leftStats: '',
-  rightStats: '',
+  stats: '',
   scrambleImageHeight: 0,
   scrambleTextHeight: 0,
 };
@@ -19,11 +18,8 @@ export const timerScreenSlice = createSlice({
     toggleScrambleImageModalVisibility: state => {
       state.isScrambleImageModalVisible = !state.isScrambleImageModalVisible;
     },
-    setLeftStats: (state, action) => {
-      state.leftStats = action.payload;
-    },
-    setRightStats: (state, action) => {
-      state.rightStats = action.payload;
+    setStats: (state, action) => {
+      state.stats = action.payload;
     },
     setScrambleImageHeight: (state, action) => {
       state.scrambleImageHeight = action.payload;
@@ -37,8 +33,7 @@ export const timerScreenSlice = createSlice({
 export const {
   toggleCommentsModalVisibility,
   toggleScrambleImageModalVisibility,
-  setLeftStats,
-  setRightStats,
+  setStats,
   setScrambleImageHeight,
   setScrambleTextHeight,
 } = timerScreenSlice.actions;

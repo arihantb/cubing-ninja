@@ -1,31 +1,21 @@
-import Modal from 'react-native-modal';
 import PropTypes from 'prop-types';
-import React, {memo, useRef, useState} from 'react';
+import React, {memo, useState} from 'react';
 import moment from 'moment';
-import {Animated, Pressable, ScrollView, Share, View} from 'react-native';
-import {Divider, Input} from 'react-native-elements';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {Dimensions, Pressable, ScrollView, Share, View} from 'react-native';
 import {SvgXml} from 'react-native-svg';
 import {
   faBan,
   faCalendar,
-  faCheck,
-  faChevronDown,
   faCommentAlt,
   faFlag,
   faShareAlt,
   faStickyNote,
-  faTimes,
   faTrash,
   faUndo,
-  faVectorSquare,
 } from '@fortawesome/free-solid-svg-icons';
 import {useDispatch, useSelector} from 'react-redux';
-import {Text} from '_components';
-import {
-  toggleEditCommentsVisibility,
-  toggleScrambleImageVisibility,
-} from '../redux/solvesModalSlice';
+import {Icon, Input, Modal, Text} from '_components';
+import {toggleEditCommentsVisibility} from '../redux/solvesModalSlice';
 import {
   toggleUpdateSolvesStatus,
   toggleSolvesModalVisibility,
@@ -33,15 +23,25 @@ import {
 } from '../redux/solvesScreenSlice';
 import {toggleUpdateStatsStatus} from '../redux/statsScreenSlice';
 import {getTimeInMilliseconds, getTimeInString} from '../utils/formatTime';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {strings} from '_data/strings';
+import {styled} from 'nativewind';
+import {PressableIcon} from '../../../components';
+import {AnimatePresence, View as MotiView} from 'moti';
+import {
+  Layout,
+  SlideInLeft,
+  SlideInRight,
+  SlideOutRight,
+} from 'react-native-reanimated';
+
+const StyledKeyboardAwareScrollView = styled(KeyboardAwareScrollView, {
+  props: {contentContainerStyle: true},
+});
 
 const SolvesModal = props => {
-  const heightAnim = useRef(new Animated.Value(0)).current;
-
   const isEditCommentsVisible = useSelector(
     state => state.solvesModal.isEditCommentsVisible,
-  );
-  const isScrambleImageVisible = useSelector(
-    state => state.solvesModal.isScrambleImageVisible,
   );
   const solveData = useSelector(state => state.solvesScreen.solveData);
 
@@ -58,29 +58,11 @@ const SolvesModal = props => {
     return date + '\n' + time;
   };
 
-  const heightAnimIn = () => {
-    dispatch(toggleScrambleImageVisibility());
-    Animated.timing(heightAnim, {
-      toValue: 170,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
-  };
-
-  const heightAnimOut = () => {
-    dispatch(toggleScrambleImageVisibility());
-    Animated.timing(heightAnim, {
-      toValue: 0,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
-  };
-
   const _getMessage = () => {
     const date = getDate().replace('\n', ' ');
-    return `Time: ${solveData.time}\n\nSolved on: ${date}\n\nScramble: ${
-      solveData.scrambleText
-    }
+    return `Time: ${solveData.time}\n\nPenalty: ${
+      solveData.penalty === '' ? 'N/A' : solveData.penalty
+    }\n\nSolved on: ${date}\n\nScramble: ${solveData.scrambleText}
     ${solveData.comments !== '' ? `\n\nNotes:\n${solveData.comments}` : ''}`;
   };
 
@@ -94,11 +76,14 @@ const SolvesModal = props => {
 
   return (
     <Modal
-      onBackdropPress={() => setVisible(false)}
-      onBackButtonPress={() => setVisible(false)}
-      useNativeDriver
-      useNativeDriverForBackdrop
-      onModalHide={() => {
+      onClose={() => {
+        if (isEditCommentsVisible) {
+          dispatch(toggleEditCommentsVisibility());
+        }
+
+        setVisible(false);
+      }}
+      onHide={() => {
         dispatch(
           updateSolve({
             id: solveData.id,
@@ -109,148 +94,145 @@ const SolvesModal = props => {
         );
         dispatch(toggleSolvesModalVisibility());
       }}
-      backdropTransitionOutTiming={0}
+      title="Solve Details"
       isVisible={visible}>
-      <View className="flex-1 items-center justify-center">
-        <View className="w-4/5 rounded-md bg-neutral-50 dark:bg-neutral-800">
-          <View className="m-3 flex-row items-center justify-center">
-            <View className="flex-row items-center">
-              <Text className="text-3xl">
-                {penalty === 'DNF' ? 'DNF' : penalizedTime}
+      <StyledKeyboardAwareScrollView
+        contentContainerStyle="flex-grow"
+        showsVerticalScrollIndicator={false}>
+        <View className="flex-row my-3 justify-between">
+          <View className="flex-row gap-3 items-center">
+            <Text className="text-3xl text-indigo-500">
+              {penalty === 'DNF' ? 'DNF' : penalizedTime}
+            </Text>
+            {penalty !== 'DNF' && (
+              <Text className="text-red-500 text-lg">{penalty}</Text>
+            )}
+          </View>
+          <View className="flex-row gap-3 items-center">
+            <Icon icon={faCalendar} color="bg-neutral-500" />
+            <Text>{getDate()}</Text>
+          </View>
+        </View>
+        {solveData.scrambleText !== '' && (
+          <View className="my-3 p-2 rounded-md items-center bg-neutral-700 max-h-[100]">
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text className="text-lg text-justify">
+                {solveData.scrambleText}
               </Text>
-              {penalty !== 'DNF' && (
-                <Text className="ml-2 text-red-500 text-lg">{penalty}</Text>
+            </ScrollView>
+          </View>
+        )}
+        {solveData.scrambleImage !== '' && (
+          <View className="my-3 h-60 items-center">
+            <SvgXml xml={solveData.scrambleImage} height="100%" width="75%" />
+          </View>
+        )}
+        <AnimatePresence>
+          {(isEditCommentsVisible || comments !== '') && (
+            <View className="my-3 min-h-[150] max-h-[150]">
+              <View className="flex-row justify-between">
+                <MotiView
+                  from={{translateX: -Dimensions.get('window').width}}
+                  animate={{translateX: 0}}
+                  exit={{translateX: Dimensions.get('window').width}}
+                  layout={Layout}
+                  transition={{type: 'timing'}}
+                  className="flex-row gap-3">
+                  <Icon icon={faStickyNote} color="bg-neutral-500" />
+                  <Text className="text-neutral-500">Comments:</Text>
+                </MotiView>
+                <AnimatePresence>
+                  {isEditCommentsVisible && comments !== '' && (
+                    <MotiView
+                      from={{translateX: Dimensions.get('window').width}}
+                      animate={{translateX: 0}}
+                      exit={{translateX: Dimensions.get('window').width}}
+                      layout={Layout}
+                      transition={{type: 'timing'}}>
+                      <Pressable onPress={() => setComments('')}>
+                        <Text className="text-red-500">{strings.clear}</Text>
+                      </Pressable>
+                    </MotiView>
+                  )}
+                </AnimatePresence>
+              </View>
+              {isEditCommentsVisible && (
+                <MotiView
+                  from={{translateX: -Dimensions.get('window').width}}
+                  animate={{translateX: 0}}
+                  exit={{translateX: Dimensions.get('window').width}}
+                  layout={Layout}
+                  transition={{type: 'timing'}}
+                  className="my-2">
+                  <Input
+                    className="p-3 text-base"
+                    inputType="text"
+                    multiline={true}
+                    defaultValue={comments}
+                    placeholder="Comments"
+                    onChangeText={text => setComments(text.trim())}
+                  />
+                </MotiView>
+              )}
+              {!isEditCommentsVisible && comments !== '' && (
+                <MotiView
+                  from={{translateX: -Dimensions.get('window').width}}
+                  animate={{translateX: 0}}
+                  exit={{translateX: Dimensions.get('window').width}}
+                  layout={Layout}
+                  transition={{type: 'timing'}}
+                  className="my-2 p-3 rounded-md bg-neutral-700">
+                  <ScrollView showsVerticalScrollIndicator={false}>
+                    <Text>{comments}</Text>
+                  </ScrollView>
+                </MotiView>
               )}
             </View>
-            <View className="flex-row items-center">
-              <FontAwesomeIcon icon={faCalendar} color={'#A8A8A8'} />
-              <Text className="ml-3">{getDate()}</Text>
-            </View>
-          </View>
-          <Divider color={'#D2D2D2'} width={1} />
-          {isEditCommentsVisible ? (
-            <View className="mx-3 flex-row items-center">
-              <Input
-                inputStyle={{
-                  fontFamily: 'GoogleSans-Bold',
-                  fontSize: 18,
-                  paddingBottom: 0,
-                }}
-                defaultValue={comments}
-                multiline
-                containerStyle={{
-                  flex: 1,
-                  marginLeft: -10,
-                  marginRight: 10,
-                  marginBottom: -10,
-                  maxHeight: 200,
-                }}
-                rightIcon={() =>
-                  comments !== '' && (
-                    <Pressable onPress={() => setComments('')}>
-                      <View style={{padding: 5}}>
-                        <FontAwesomeIcon icon={faTimes} color={'#A8A8A8'} />
-                      </View>
-                    </Pressable>
-                  )
-                }
-                rightIconContainerStyle={{marginBottom: -12}}
-                placeholder="Notes"
-                onChangeText={val => setComments(val.trim())}
+          )}
+        </AnimatePresence>
+        <View className="flex-1 flex-row my-3 items-end justify-between">
+          <View className="flex-row gap-3">
+            <View>
+              <PressableIcon
+                containerStyle="p-2"
+                icon={faShareAlt}
+                color="bg-neutral-500"
+                size={20}
+                onPress={_share}
               />
-              <Pressable
-                onPress={() => dispatch(toggleEditCommentsVisibility())}>
-                <View className="p-3">
-                  <FontAwesomeIcon icon={faCheck} color={'#00FF00'} />
-                </View>
-              </Pressable>
             </View>
-          ) : (
-            comments !== '' && (
-              <View className="ml-4 flex-row items-center">
-                <FontAwesomeIcon icon={faStickyNote} color={'#A8A8A8'} />
-                <ScrollView
-                  className="max-h-[150]"
-                  showsVerticalScrollIndicator={false}>
-                  <Text className="m-4 ml-3">{comments}</Text>
-                </ScrollView>
-              </View>
-            )
-          )}
-          {isEditCommentsVisible && <Divider color={'#D2D2D2'} width={1} />}
-          {solveData.scrambleText !== '' && (
-            <Pressable
-              className="ml-4 flex-row items-center"
-              onPress={() =>
-                isScrambleImageVisible ? heightAnimOut() : heightAnimIn()
-              }>
-              <FontAwesomeIcon icon={faVectorSquare} color={'#A8A8A8'} />
-              <Text className="flex-1 mx-3">{solveData.scrambleText}</Text>
-              <Animated.View
-                style={{
-                  transform: [
-                    {
-                      rotateZ: heightAnim.interpolate({
-                        inputRange: [0, 170],
-                        outputRange: ['0deg', '180deg'],
-                      }),
-                    },
-                  ],
-                }}>
-                <FontAwesomeIcon
-                  icon={faChevronDown}
-                  color={'#000000'}
-                  size={12}
-                />
-              </Animated.View>
-            </Pressable>
-          )}
-          {solveData.scrambleImage !== '' && (
-            <Animated.View
-              className={`overflow-hidden items-center justify-center [height:${heightAnim}]`}>
-              <SvgXml
-                xml={solveData.scrambleImage}
-                height={150}
-                width={'100%'}
-                className="mb-5"
-              />
-            </Animated.View>
-          )}
-          {solveData.scrambleText !== '' && (
-            <Divider color={'#D2D2D2'} width={1} />
-          )}
-          <View className="flex-row justify-between">
-            <View className="flex-row">
-              <Pressable onPress={() => _share()}>
-                <FontAwesomeIcon
-                  icon={faShareAlt}
-                  color={'#A8A8A8'}
-                  className="ml-4 my-4"
-                />
-              </Pressable>
-              <Pressable
+            <View>
+              <PressableIcon
+                containerStyle="p-2"
+                icon={faTrash}
+                color="bg-neutral-500"
+                size={20}
                 onPress={() => {
                   props.deleteSolve(solveData.id);
                   setVisible(false);
-                }}>
-                <FontAwesomeIcon
-                  icon={faTrash}
-                  color={'#A8A8A8'}
-                  className="ml-4 my-4"
-                />
-              </Pressable>
+                }}
+              />
             </View>
-            <View className="flex-row">
-              <Pressable
-                onPress={() => dispatch(toggleEditCommentsVisibility())}>
-                <FontAwesomeIcon
-                  icon={faCommentAlt}
-                  color={!isEditCommentsVisible ? '#A8A8A8' : colors.blue}
-                  className="mr-4 my-4"
-                />
-              </Pressable>
-              {penalty !== '' && (
-                <Pressable
+          </View>
+          <View className="flex-row gap-3">
+            <View>
+              <PressableIcon
+                containerStyle="p-2"
+                icon={faCommentAlt}
+                color={
+                  !isEditCommentsVisible ? 'bg-neutral-500' : 'bg-indigo-500'
+                }
+                size={20}
+                onPress={() => dispatch(toggleEditCommentsVisibility())}
+              />
+            </View>
+            {penalty !== '' && (
+              <View>
+                <PressableIcon
+                  containerStyle="p-2"
+                  icon={faUndo}
+                  color="bg-neutral-500"
+                  size={20}
                   onPress={() => {
                     if (penalty === '+2') {
                       setPenalizedTime(
@@ -261,28 +243,30 @@ const SolvesModal = props => {
                     }
 
                     setPenalty('');
-                  }}>
-                  <FontAwesomeIcon
-                    icon={faUndo}
-                    color={'#A8A8A8'}
-                    className="mr-4 my-4"
-                  />
-                </Pressable>
-              )}
-              {penalty === '' && (
-                <Pressable
+                  }}
+                />
+              </View>
+            )}
+            {penalty === '' && (
+              <View>
+                <PressableIcon
+                  containerStyle="p-2"
+                  icon={faBan}
+                  color="bg-neutral-500"
+                  size={20}
                   onPress={() => {
                     setPenalty('DNF');
-                  }}>
-                  <FontAwesomeIcon
-                    icon={faBan}
-                    color={'#A8A8A8'}
-                    className="mr-4 my-4"
-                  />
-                </Pressable>
-              )}
-              {penalty === '' && (
-                <Pressable
+                  }}
+                />
+              </View>
+            )}
+            {penalty === '' && (
+              <View>
+                <PressableIcon
+                  containerStyle="p-2"
+                  icon={faFlag}
+                  color="bg-neutral-500"
+                  size={20}
                   onPress={() => {
                     setPenalizedTime(
                       getTimeInString(
@@ -290,18 +274,13 @@ const SolvesModal = props => {
                       ),
                     );
                     setPenalty('+2');
-                  }}>
-                  <FontAwesomeIcon
-                    icon={faFlag}
-                    color={'#A8A8A8'}
-                    className="mr-4 my-4"
-                  />
-                </Pressable>
-              )}
-            </View>
+                  }}
+                />
+              </View>
+            )}
           </View>
         </View>
-      </View>
+      </StyledKeyboardAwareScrollView>
     </Modal>
   );
 };

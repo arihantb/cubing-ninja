@@ -16,8 +16,6 @@ import org.worldcubeassociation.tnoodle.svglite.Dimension;
 import org.worldcubeassociation.tnoodle.svglite.Svg;
 
 import java.util.Base64;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 class Scramble {
 	public String scrambleText;
@@ -35,9 +33,6 @@ class Scramble {
 }
 
 public class ScrambleModule extends ReactContextBaseJavaModule {
-	private static final String PARTITION = "--PARTITION--";
-	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(10);
-
 	ScrambleModule(ReactApplicationContext context) {
 		super(context);
 	}
@@ -45,7 +40,7 @@ public class ScrambleModule extends ReactContextBaseJavaModule {
 	@NonNull
 	@Override
 	public String getName() {
-		return "ScrambleModule";
+		return "Scramble";
 	}
 
 	@ReactMethod

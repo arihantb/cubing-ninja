@@ -313,10 +313,7 @@ const TimerSettings = () => {
         <InspectionDurationModal />
       )}
       <View className="flex-1 bg-neutral-50 dark:bg-neutral-900">
-        <Header
-          title={strings.timerSettingsTitle}
-          backButtonAction={setVisible}
-        />
+        <Header title={strings.timerSettingsTitle} onClose={setVisible} />
         <SectionList
           itemDimension={100}
           itemContainerStyle={{alignItems: 'center'}}

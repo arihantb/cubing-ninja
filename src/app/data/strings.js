@@ -37,6 +37,7 @@ export const strings = {
   forgotPassword: 'Forgot password?',
   resetPassword: 'Reset Password',
   cancel: 'CANCEL',
+  close: 'CLOSE',
   enterEmail: 'Enter Email',
   enterNewEmail: 'Enter New Email',
   enterNewPassword: 'Enter New Password',

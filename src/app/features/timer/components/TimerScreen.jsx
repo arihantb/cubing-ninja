@@ -1,5 +1,12 @@
-import React, {memo, useRef, useEffect} from 'react';
-import {Animated, View} from 'react-native';
+import React, {memo, useEffect} from 'react';
+import {Dimensions, View} from 'react-native';
+import {
+  FadeInDown,
+  FadeInUp,
+  FadeOutDown,
+  FadeOutUp,
+  Layout,
+} from 'react-native-reanimated';
 import {LinearProgress} from 'react-native-elements';
 import {SvgXml} from 'react-native-svg';
 import {useDispatch, useSelector} from 'react-redux';
@@ -8,87 +15,30 @@ import {loadFromLocalStorage} from '_libs';
 import Stopwatch from './Stopwatch';
 import ScrambleImageModal from '../modals/ScrambleImageModal';
 import {
-  setLeftStats,
-  setRightStats,
+  setStats,
   setScrambleImageHeight,
   setScrambleTextHeight,
   toggleScrambleImageModalVisibility,
 } from '../redux/timerScreenSlice';
-import {heightAnimOut, heightAnimIn} from '../../../utils/animations';
 import {getTimeInMilliseconds, getTimeInString} from '../utils/formatTime';
-import {useHexColor} from '../../../hooks/useHexColor';
+import {useHexColor} from '_hooks';
 import {Loading} from '../../../components';
+import {AnimatePresence, View as MotiView} from 'moti';
 
 const TimerScreen = () => {
-  const heightAnim = useRef(new Animated.Value(100)).current;
-
   const isScrambleImageModalVisible = useSelector(
     state => state.timerScreen.isScrambleImageModalVisible,
   );
   const isStopwatchOn = useSelector(state => state.stopwatch.isStopwatchOn);
   const solves = useSelector(state => state.solvesScreen.solves);
-  const leftStats = useSelector(state => state.timerScreen.leftStats);
   const puzzle = useSelector(state => state.home.puzzle);
-  const rightStats = useSelector(state => state.timerScreen.rightStats);
+  const stats = useSelector(state => state.timerScreen.stats);
   const scrambleData = useSelector(state => state.home.scrambleData);
-  const scrambleImageHeight = useSelector(
-    state => state.timerScreen.scrambleImageHeight,
-  );
-  const scrambleTextHeight = useSelector(
-    state => state.timerScreen.scrambleTextHeight,
-  );
   const timerSettings = useSelector(state => state.timerSettings.timerSettings);
 
   const dispatch = useDispatch();
 
-  const _getLeftStats = async () => {
-    let deviation = 0;
-    let average = 0;
-    let best = Number.MAX_VALUE;
-    let count = 0;
-    let total = 0;
-    let solvesLength = 0;
-
-    const solves = await loadFromLocalStorage(`solves/${puzzle}`);
-
-    if (
-      solves === null ||
-      solves.length === 0 ||
-      solves.every(val => val.penalty === 'DNF')
-    ) {
-      return `Deviation: --\nAverage: --\nBest: --\nCount: ${
-        solves === null ? 0 : solves.length
-      }`;
-    }
-
-    solvesLength = solves.length;
-
-    solves.forEach(val => {
-      if (val.penalty !== 'DNF') {
-        total += getTimeInMilliseconds(val.penalizedTime);
-
-        if (best > getTimeInMilliseconds(val.penalizedTime)) {
-          best = getTimeInMilliseconds(val.penalizedTime);
-        }
-
-        count++;
-      }
-    });
-
-    solves.forEach(val => {
-      if (val.penalty !== 'DNF') {
-        deviation += (getTimeInMilliseconds(val.penalizedTime) - average) ** 2;
-      }
-    });
-
-    deviation = getTimeInString(Math.sqrt(deviation / count));
-    average = getTimeInString(total / count);
-    best = getTimeInString(best);
-
-    return `Deviation: ${deviation}\nAverage: ${average}\nBest: ${best}\nCount: ${solvesLength}`;
-  };
-
-  const _getRightStats = async () => {
+  const _getStats = async () => {
     let ao5 = '--';
     let ao12 = '--';
     let ao50 = '--';
@@ -100,32 +50,34 @@ const TimerScreen = () => {
 
     const solves = await loadFromLocalStorage(`solves/${puzzle}`);
 
-    if (solves === null || solves.length === 0) {
-      return 'Ao5: --\nAo12: --\nAo50: --\nAo100: --';
-    }
-
-    solves.forEach((val, idx) => {
+    solves?.forEach((val, idx) => {
       if (val.penalty === 'DNF' && idx < 100) {
         dnfCount++;
       }
 
       if (dnfCount < 2) {
         total += getTimeInMilliseconds(val.penalizedTime);
+
         if (best > getTimeInMilliseconds(val.penalizedTime)) {
           best = getTimeInMilliseconds(val.penalizedTime);
         }
+
         if (worst < getTimeInMilliseconds(val.penalizedTime)) {
           worst = getTimeInMilliseconds(val.penalizedTime);
         }
+
         if (idx >= 4) {
           ao5 = getTimeInString((total - best - worst) / 3);
         }
+
         if (idx >= 11) {
           ao12 = getTimeInString((total - best - worst) / 10);
         }
+
         if (idx >= 49) {
           ao50 = getTimeInString((total - best - worst) / 48);
         }
+
         if (idx >= 99) {
           ao100 = getTimeInString((total - best - worst) / 98);
         }
@@ -133,33 +85,31 @@ const TimerScreen = () => {
         if (idx >= 4) {
           ao5 = 'DNF';
         }
+
         if (idx >= 11) {
           ao12 = 'DNF';
         }
+
         if (idx >= 49) {
           ao50 = 'DNF';
         }
+
         if (idx >= 99) {
           ao100 = 'DNF';
         }
       }
     });
 
-    return `Ao5: ${ao5}\nAo12: ${ao12}\nAo50: ${ao50}\nAo100: ${ao100}`;
+    return {ao5, ao12, ao50, ao100};
   };
 
   const _updateStatus = () => {
-    _getLeftStats().then(val => dispatch(setLeftStats(val)));
-    _getRightStats().then(val => dispatch(setRightStats(val)));
+    _getStats().then(val => dispatch(setStats(val)));
   };
 
   useEffect(() => {
     _updateStatus();
   }, [solves]);
-
-  useEffect(() => {
-    isStopwatchOn ? heightAnimOut(heightAnim) : heightAnimIn(heightAnim);
-  }, [isStopwatchOn]);
 
   const indigoHexColor = useHexColor('bg-indigo-500');
 
@@ -167,65 +117,89 @@ const TimerScreen = () => {
     <View className="flex-1 bg-neutral-50 dark:bg-neutral-900">
       {isScrambleImageModalVisible && <ScrambleImageModal />}
       <Stopwatch />
-      {timerSettings.shouldGenerateScrambles && (
-        <Animated.View
-          className="absolute flex-row top-0 p-4"
-          style={[
-            {
-              transform: [
-                {
-                  translateY: heightAnim.interpolate({
-                    inputRange: [0, 100],
-                    outputRange: [-scrambleTextHeight - 55, 0],
-                  }),
-                },
-              ],
-            },
-          ]}
-          onLayout={event =>
-            dispatch(setScrambleTextHeight(event.nativeEvent.layout.height))
-          }>
-          {scrambleData.scrambleLoading ? (
-            <LinearProgress color={indigoHexColor} />
-          ) : (
-            <Text className="flex-1 text-center">
-              {scrambleData.scrambleText}
-            </Text>
-          )}
-        </Animated.View>
-      )}
-      <Animated.View
-        className="absolute flex-row bottom-0 p-4"
-        style={[
-          {
-            transform: [
-              {
-                translateY: heightAnim.interpolate({
-                  inputRange: [0, 100],
-                  outputRange: [scrambleImageHeight + 55, 0],
-                }),
-              },
-            ],
-          },
-        ]}
-        onLayout={event => {
-          dispatch(setScrambleImageHeight(event.nativeEvent.layout.height));
-        }}>
-        <Text className="flex-1">{leftStats}</Text>
-        {scrambleData.scrambleImage !== '' &&
-          timerSettings.shouldGenerateScrambles &&
-          (scrambleData.scrambleLoading ? (
-            <Loading color="bg-indigo-500" size="large" />
-          ) : (
-            <SvgXml
-              xml={scrambleData.scrambleImage}
-              height="100%"
-              width="40%"
-              onPress={() => dispatch(toggleScrambleImageModalVisibility())}
-            />
-          ))}
-        <Text className="flex-1 text-right">{rightStats}</Text>
-      </Animated.View>
+      <AnimatePresence>
+        {timerSettings.shouldGenerateScrambles && !isStopwatchOn && (
+          <MotiView
+            from={{opacity: 0}}
+            animate={{opacity: 1}}
+            exit={{opacity: 0}}
+            layout={Layout}
+            transition={{type: 'timing'}}
+            className="absolute flex-row top-0 p-4"
+            onLayout={event =>
+              dispatch(setScrambleTextHeight(event.nativeEvent.layout.height))
+            }>
+            {scrambleData.scrambleLoading ? (
+              <LinearProgress color={indigoHexColor} />
+            ) : (
+              <Text className="flex-1 text-lg text-center">
+                {scrambleData.scrambleText}
+              </Text>
+            )}
+          </MotiView>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {!isStopwatchOn && (
+          <MotiView
+            from={{opacity: 0}}
+            animate={{opacity: 1}}
+            exit={{opacity: 0}}
+            layout={Layout}
+            transition={{type: 'timing'}}
+            className="absolute flex-row bottom-0 p-4 gap-4"
+            onLayout={event => {
+              dispatch(setScrambleImageHeight(event.nativeEvent.layout.height));
+            }}>
+            {scrambleData.scrambleImage !== '' &&
+              timerSettings.shouldGenerateScrambles &&
+              (scrambleData.scrambleLoading ? (
+                <Loading color="bg-indigo-500" size="large" />
+              ) : (
+                <View className="flex-1 p-2 rounded-md bg-neutral-800">
+                  <SvgXml
+                    xml={scrambleData.scrambleImage}
+                    height="100%"
+                    width="100%"
+                    onPress={() =>
+                      dispatch(toggleScrambleImageModalVisibility())
+                    }
+                  />
+                </View>
+              ))}
+            <View className="flex-1 rounded-md bg-neutral-800">
+              <View className="flex-row p-2">
+                <View className="flex-1">
+                  <Text className="flex-1 text-center">AO5</Text>
+                  <Text className="flex-1 text-3xl text-center text-indigo-500">
+                    {stats.ao5}
+                  </Text>
+                </View>
+                <View className="flex-1">
+                  <Text className="flex-1 text-center">AO12</Text>
+                  <Text className="flex-1 text-3xl text-center text-indigo-500">
+                    {stats.ao12}
+                  </Text>
+                </View>
+              </View>
+              <View className="flex-row p-2">
+                <View className="flex-1">
+                  <Text className="flex-1 text-center">AO50</Text>
+                  <Text className="flex-1 text-3xl text-center text-indigo-500">
+                    {stats.ao50}
+                  </Text>
+                </View>
+                <View className="flex-1">
+                  <Text className="flex-1 text-center">AO100</Text>
+                  <Text className="flex-1 text-3xl text-center text-indigo-500">
+                    {stats.ao100}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </MotiView>
+        )}
+      </AnimatePresence>
     </View>
   );
 };

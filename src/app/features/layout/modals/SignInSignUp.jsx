@@ -1,6 +1,6 @@
 import Modal from 'react-native-modal';
 import React, {memo, useCallback, useEffect, useRef} from 'react';
-import {Image, Pressable, View} from 'react-native';
+import {Dimensions, Image, Pressable, View} from 'react-native';
 import {useNetInfo} from '@react-native-community/netinfo';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useDispatch, useSelector} from 'react-redux';
@@ -48,6 +48,13 @@ import ForgotPasswordModal from './ForgotPasswordModal';
 import {toggleForgotPasswordModalVisibilityFromModal} from '../redux/forgotPasswordModalSlice';
 import {getSolves} from '../../../utils';
 import {Icon} from '../../../components';
+import {AnimatePresence, View as MotiView} from 'moti';
+import {
+  Layout,
+  SlideInLeft,
+  SlideInRight,
+  SlideOutRight,
+} from 'react-native-reanimated';
 
 const SignInSignUp = () => {
   const netInfo = useNetInfo();
@@ -279,162 +286,215 @@ const SignInSignUp = () => {
       <View className="flex-1 bg-neutral-50 dark:bg-neutral-900">
         <Header
           title={mode}
-          backButtonAction={() =>
-            dispatch(toggleSignInSignUpVisibilityFromModal())
-          }
+          onClose={() => dispatch(toggleSignInSignUpVisibilityFromModal())}
         />
         {netInfo.isConnected && netInfo.isInternetReachable ? (
-          <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
-            <View className="items-center">
-              <Image source={{uri: logo}} />
+          <KeyboardAwareScrollView
+            contentContainerStyle={{flexGrow: 1}}
+            showsVerticalScrollIndicator={false}>
+            <View className="m-10 items-center">
+              <Image source={{uri: logo}} className="h-24 w-24 rounded-md" />
             </View>
-            <View className="p-4 gap-4">
-              <View>
-                {isUsernameInputVisible && (
-                  <Input
-                    ref={usernameInput}
-                    inputMode="text"
-                    returnKeyType="next"
-                    placeholder={strings.username}
-                    leftIcon={faUser}
-                    value={username}
-                    onChangeText={text => dispatch(setUsername(text))}
-                    errorMessage={errorMessage.username}
-                    onSubmitEditing={() =>
-                      isUsernameInputVisible
-                        ? emailInput.current.focus()
-                        : passwordInput.current.focus()
-                    }
-                  />
-                )}
+            <View className="flex-1">
+              <View className="flex-1">
+                <View className="p-4 gap-4">
+                  <View className="flex-1">
+                    <AnimatePresence>
+                      {isUsernameInputVisible && (
+                        <MotiView
+                          className="flex-1"
+                          from={{translateX: -Dimensions.get('window').width}}
+                          animate={{translateX: 0}}
+                          exit={{translateX: Dimensions.get('window').width}}
+                          layout={Layout}
+                          transition={{type: 'timing'}}>
+                          <Input
+                            ref={usernameInput}
+                            inputMode="text"
+                            returnKeyType="next"
+                            placeholder={strings.username}
+                            leftIcon={faUser}
+                            value={username}
+                            onChangeText={text => dispatch(setUsername(text))}
+                            errorMessage={errorMessage.username}
+                            onSubmitEditing={() =>
+                              isUsernameInputVisible
+                                ? emailInput.current.focus()
+                                : passwordInput.current.focus()
+                            }
+                          />
+                        </MotiView>
+                      )}
+                    </AnimatePresence>
+                  </View>
+                  <MotiView
+                    className="flex-1"
+                    from={{translateX: -Dimensions.get('window').width}}
+                    animate={{translateX: 0}}
+                    exit={{translateX: Dimensions.get('window').width}}
+                    layout={Layout}
+                    transition={{type: 'timing'}}>
+                    <Input
+                      ref={emailInput}
+                      inputMode="email"
+                      returnKeyType="next"
+                      placeholder={strings.email}
+                      leftIcon={faEnvelope}
+                      value={email}
+                      onChangeText={text => dispatch(setEmail(text))}
+                      errorMessage={errorMessage.email}
+                      onSubmitEditing={() => passwordInput.current.focus()}
+                    />
+                  </MotiView>
+                  <MotiView
+                    className="flex-1"
+                    from={{translateX: -Dimensions.get('window').width}}
+                    animate={{translateX: 0}}
+                    exit={{translateX: Dimensions.get('window').width}}
+                    layout={Layout}
+                    transition={{type: 'timing'}}>
+                    <Input
+                      ref={passwordInput}
+                      inputMode="text"
+                      returnKeyType="next"
+                      placeholder={strings.password}
+                      leftIcon={faLock}
+                      rightIcon={
+                        <Pressable
+                          onPressIn={() => {
+                            if (!isPasswordShown) {
+                              dispatch(toggleShowPasswordStatus());
+                            }
+                          }}
+                          onPressOut={() => {
+                            if (isPasswordShown) {
+                              dispatch(toggleShowPasswordStatus());
+                            }
+                          }}>
+                          <Icon
+                            icon={isPasswordShown ? faEye : faEyeSlash}
+                            size={isPasswordShown ? 20 : 22}
+                            color="bg-neutral-400"
+                          />
+                        </Pressable>
+                      }
+                      secureTextEntry={!isPasswordShown}
+                      value={password}
+                      onChangeText={text => dispatch(setPassword(text))}
+                      errorMessage={errorMessage.password}
+                      onSubmitEditing={() =>
+                        isConfirmPasswordInputVisible
+                          ? confirmPasswordInput.current.focus()
+                          : _submit()
+                      }
+                    />
+                  </MotiView>
+                  <View className="flex-1">
+                    <AnimatePresence>
+                      {isConfirmPasswordInputVisible && (
+                        <MotiView
+                          className="flex-1"
+                          from={{translateX: -Dimensions.get('window').width}}
+                          animate={{translateX: 0}}
+                          exit={{translateX: Dimensions.get('window').width}}
+                          layout={Layout}
+                          transition={{type: 'timing'}}>
+                          <Input
+                            ref={confirmPasswordInput}
+                            inputMode="text"
+                            returnKeyType="go"
+                            placeholder={strings.confirmPassword}
+                            leftIcon={faLock}
+                            rightIcon={
+                              <Pressable
+                                onPressIn={() => {
+                                  if (!isConfirmPasswordShown) {
+                                    dispatch(toggleShowConfirmPasswordStatus());
+                                  }
+                                }}
+                                onPressOut={() => {
+                                  if (isConfirmPasswordShown) {
+                                    dispatch(toggleShowConfirmPasswordStatus());
+                                  }
+                                }}>
+                                <Icon
+                                  icon={
+                                    isConfirmPasswordShown ? faEye : faEyeSlash
+                                  }
+                                  size={isConfirmPasswordShown ? 20 : 22}
+                                  color="bg-neutral-400"
+                                />
+                              </Pressable>
+                            }
+                            secureTextEntry={!isConfirmPasswordShown}
+                            value={confirmPassword}
+                            onChangeText={text =>
+                              dispatch(setConfirmPassword(text))
+                            }
+                            errorMessage={errorMessage.confirmPassword}
+                            onSubmitEditing={() => _submit()}
+                          />
+                        </MotiView>
+                      )}
+                    </AnimatePresence>
+                  </View>
+                  <View className="flex-1">
+                    {mode === strings.signIn && (
+                      <MotiView
+                        className="flex-1 items-end"
+                        from={{translateX: Dimensions.get('window').width}}
+                        animate={{translateX: 0}}
+                        exit={{translateX: Dimensions.get('window').width}}
+                        transition={{type: 'timing', delay: 400}}>
+                        <Pressable
+                          onPress={() => {
+                            dispatch(toggleForgotPasswordModalVisibility());
+                            dispatch(
+                              toggleForgotPasswordModalVisibilityFromModal(),
+                            );
+                          }}>
+                          <Text>{strings.forgotPassword}</Text>
+                        </Pressable>
+                      </MotiView>
+                    )}
+                  </View>
+                </View>
               </View>
-              <View>
-                <Input
-                  ref={emailInput}
-                  inputMode="email"
-                  returnKeyType="next"
-                  placeholder={strings.email}
-                  leftIcon={faEnvelope}
-                  value={email}
-                  onChangeText={text => dispatch(setEmail(text))}
-                  errorMessage={errorMessage.email}
-                  onSubmitEditing={() => passwordInput.current.focus()}
-                />
-              </View>
-              <View>
-                <Input
-                  ref={passwordInput}
-                  inputMode="text"
-                  returnKeyType="next"
-                  placeholder={strings.password}
-                  leftIcon={faLock}
-                  rightIcon={
-                    <Pressable
-                      onPressIn={() => {
-                        if (!isPasswordShown) {
-                          dispatch(toggleShowPasswordStatus());
-                        }
-                      }}
-                      onPressOut={() => {
-                        if (isPasswordShown) {
-                          dispatch(toggleShowPasswordStatus());
-                        }
-                      }}>
-                      <Icon
-                        icon={isPasswordShown ? faEye : faEyeSlash}
-                        size={isPasswordShown ? 20 : 22}
-                        color="bg-neutral-400"
-                      />
-                    </Pressable>
-                  }
-                  secureTextEntry={!isPasswordShown}
-                  value={password}
-                  onChangeText={text => dispatch(setPassword(text))}
-                  errorMessage={errorMessage.password}
-                  onSubmitEditing={() =>
-                    isConfirmPasswordInputVisible
-                      ? confirmPasswordInput.current.focus()
-                      : _submit()
-                  }
-                />
-              </View>
-              <View>
-                {isConfirmPasswordInputVisible && (
-                  <Input
-                    ref={confirmPasswordInput}
-                    inputMode="text"
-                    returnKeyType="go"
-                    placeholder={strings.confirmPassword}
-                    leftIcon={faLock}
-                    rightIcon={
-                      <Pressable
-                        onPressIn={() => {
-                          if (!isConfirmPasswordShown) {
-                            dispatch(toggleShowConfirmPasswordStatus());
-                          }
-                        }}
-                        onPressOut={() => {
-                          if (isConfirmPasswordShown) {
-                            dispatch(toggleShowConfirmPasswordStatus());
-                          }
-                        }}>
-                        <Icon
-                          icon={isConfirmPasswordShown ? faEye : faEyeSlash}
-                          size={isConfirmPasswordShown ? 20 : 22}
-                          color="bg-neutral-400"
-                        />
-                      </Pressable>
-                    }
-                    secureTextEntry={!isConfirmPasswordShown}
-                    value={confirmPassword}
-                    onChangeText={text => dispatch(setConfirmPassword(text))}
-                    errorMessage={errorMessage.confirmPassword}
-                    onSubmitEditing={() => _submit()}
-                  />
-                )}
-              </View>
-            </View>
-            {mode === strings.signIn && (
-              <View className="m-4 items-end">
+              <View className="flex-1 mb-20 justify-end">
                 <Pressable
-                  onPress={() => {
-                    dispatch(toggleForgotPasswordModalVisibility());
-                    dispatch(toggleForgotPasswordModalVisibilityFromModal());
-                  }}>
-                  <Text>{strings.forgotPassword}</Text>
+                  className={`m-4 p-4 rounded-md items-center justify-center ${
+                    _isInvalidInput ? 'bg-indigo-300' : 'bg-indigo-500'
+                  }`}
+                  disabled={_isInvalidInput}
+                  onPress={() => _submit()}>
+                  {isLoggingIn ? (
+                    <Loading color="bg-indigo-500" />
+                  ) : (
+                    <Text className="text-lg text-neutral-50">{mode}</Text>
+                  )}
                 </Pressable>
+                <View className="flex-row gap-2 items-center justify-center">
+                  <Text>
+                    {mode === strings.signIn
+                      ? strings.dontHaveAccountYet
+                      : strings.alreadyHaveAnAccount}
+                  </Text>
+                  <Pressable
+                    onPress={() => {
+                      dispatch(setUsernameInputError(''));
+                      dispatch(setEmailInputError(''));
+                      dispatch(setPasswordInputError(''));
+                      dispatch(setConfirmPasswordInputError(''));
+                      dispatch(toggleMode());
+                    }}>
+                    <Text className="text-indigo-500">
+                      {mode === strings.signIn
+                        ? strings.signUp
+                        : strings.signIn}
+                    </Text>
+                  </Pressable>
+                </View>
               </View>
-            )}
-            <Pressable
-              className={`m-4 p-4 rounded-md items-center justify-center ${
-                _isInvalidInput ? 'bg-indigo-300' : 'bg-indigo-500'
-              }`}
-              disabled={_isInvalidInput}
-              onPress={() => _submit()}>
-              {isLoggingIn ? (
-                <Loading color="bg-indigo-500" />
-              ) : (
-                <Text className="text-lg text-neutral-50">{mode}</Text>
-              )}
-            </Pressable>
-            <View className="flex-row gap-2 items-center justify-center">
-              <Text>
-                {mode === strings.signIn
-                  ? strings.dontHaveAccountYet
-                  : strings.alreadyHaveAnAccount}
-              </Text>
-              <Pressable
-                onPress={() => {
-                  dispatch(setUsernameInputError(''));
-                  dispatch(setEmailInputError(''));
-                  dispatch(setPasswordInputError(''));
-                  dispatch(setConfirmPasswordInputError(''));
-                  dispatch(toggleMode());
-                }}>
-                <Text className="text-indigo-500">
-                  {mode === strings.signIn ? strings.signUp : strings.signIn}
-                </Text>
-              </Pressable>
             </View>
           </KeyboardAwareScrollView>
         ) : (

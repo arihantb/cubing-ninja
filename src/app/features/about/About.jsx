@@ -115,7 +115,7 @@ const About = () => {
   return (
     <SafeAreaProvider>
       {isPrivacyPolicyModalVisible && <PrivacyPolicyModal />}
-      <View className="flex-1 p-6 pl-12 gap-10 bg-white dark:bg-slate-800">
+      <View className="flex-1 p-6 pl-12 gap-10 bg-neutral-50 dark:bg-neutral-800">
         <Pressable
           onPress={() => {
             ToastAndroid.show(

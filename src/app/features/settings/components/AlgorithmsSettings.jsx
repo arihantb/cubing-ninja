@@ -212,10 +212,7 @@ const AlgorithmsSettings = props => {
         />
       ) : null}
       <View className="flex-1 flex-row bg-neutral-50 dark:bg-neutral-900">
-        <Header
-          title={strings.algorithmsSettingsTitle}
-          setVisible={setVisible}
-        />
+        <Header title={strings.algorithmsSettingsTitle} onClose={setVisible} />
         <SectionList
           itemDimension={100}
           itemContainerStyle={{alignItems: 'center'}}

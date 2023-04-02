@@ -1,7 +1,8 @@
-import Modal from 'react-native-modal';
 import React, {memo, useState} from 'react';
 import {SvgXml} from 'react-native-svg';
+import {View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
+import {Modal, Text} from '_components';
 import {toggleScrambleImageModalVisibility} from '../redux/timerScreenSlice';
 
 const ScrambleImageModal = () => {
@@ -13,24 +14,14 @@ const ScrambleImageModal = () => {
 
   return (
     <Modal
-      onBackdropPress={() => setVisible(false)}
-      onBackButtonPress={() => setVisible(false)}
-      animationIn="fadeIn"
-      animationOut="fadeOut"
-      backdropOpacity={1}
-      useNativeDriver
-      useNativeDriverForBackdrop
-      onModalHide={() => dispatch(toggleScrambleImageModalVisibility())}
-      backdropTransitionOutTiming={0}
+      onClose={() => setVisible(false)}
+      onHide={() => dispatch(toggleScrambleImageModalVisibility())}
+      title="Scramble"
       isVisible={visible}>
-      <SvgXml
-        xml={scrambleData.scrambleImage}
-        height="100%"
-        width="100%"
-        onPress={() => {
-          setVisible(false);
-        }}
-      />
+      <View className="flex-1 pt-10 pb-10 items-center justify-between">
+        <Text className="text-xl text-center">{scrambleData.scrambleText}</Text>
+        <SvgXml xml={scrambleData.scrambleImage} height="100%" width="100%" />
+      </View>
     </Modal>
   );
 };

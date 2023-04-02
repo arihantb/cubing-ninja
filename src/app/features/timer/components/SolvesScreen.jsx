@@ -124,25 +124,26 @@ const SolvesScreen = () => {
         onLongPress={() => dispatch(updateSelectedSolves(item.id))}>
         <Card
           title={item.penalty === 'DNF' ? 'DNF' : item.penalizedTime}
-          titleStyle="text-sm"
-          cardStyle={`items-center w-20 ${
+          className={`w-24 items-center ${
             selectedSolves.indexOf(item.id) === -1
               ? 'bg-neutral-300 dark:bg-neutral-800'
               : 'bg-neutral-400 dark:bg-neutral-700'
           }`}
         />
-        <Text className="absolute left-1 top-1">
+        <Text className="absolute left-1 top-1 text-xs text-neutral-400">
           {new Date(item.date).getDate() +
             '/' +
             (new Date(item.date).getMonth() + 1)}
         </Text>
         {item.penalty === '+2' && (
-          <Text className="absolute right-1 top-1">+2</Text>
+          <Text className="absolute right-1 top-1 text-xs text-red-500">
+            +2
+          </Text>
         )}
         {item.comments !== '' && (
           <Icon
             icon={faStickyNote}
-            color="bg-neutral-50"
+            color="bg-neutral-400"
             size={10}
             className="absolute left-1 bottom-1"
           />

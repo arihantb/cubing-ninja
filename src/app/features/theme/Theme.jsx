@@ -20,8 +20,8 @@ const Theme = () => {
           </View>
           <Switch
             className="flex-1"
-            isChecked={colorScheme === 'dark'}
-            onToggle={toggleColorScheme}
+            value={colorScheme === 'dark'}
+            onChangeValue={toggleColorScheme}
           />
         </View>
         <View>

@@ -6,7 +6,9 @@ import ImageMessage from './ImageMessage';
 import Input from './Input';
 import Loading from './Loading';
 import Modal from './Modal';
+import PressableIcon from './PressableIcon';
 import PuzzlePlayer from './PuzzlePlayer';
+import Screen from './Screen';
 import Text from './Text';
 
 export {
@@ -18,6 +20,8 @@ export {
   Input,
   Loading,
   Modal,
+  PressableIcon,
   PuzzlePlayer,
+  Screen,
   Text,
 };

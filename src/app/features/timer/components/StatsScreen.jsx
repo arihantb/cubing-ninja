@@ -193,9 +193,7 @@ const StatsScreen = () => {
 
   return (
     <View className="flex-1 bg-neutral-50 dark:bg-neutral-900">
-      <View
-        className="flex-1"
-        style={[{paddingLeft: solvesData.length === 0 && 0}]}>
+      <View className="flex-1">
         {solvesData.length === 0 ? (
           <ImageMessage message={strings.noSolves} />
         ) : (

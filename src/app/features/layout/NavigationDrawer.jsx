@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React, {memo, useEffect} from 'react';
-import {Avatar, Divider, Pressable, View} from 'react-native';
+import {Pressable, View} from 'react-native';
+import {Avatar, Divider} from 'react-native-elements';
 import {
   faStopwatch,
   faBrain,

@@ -9,14 +9,12 @@ import Text from './Text';
  * @returns the Card component.
  */
 const Card = ({title, subtitle, ...props}) => (
-  <View className="rounded-md bg-white dark:bg-slate-800 shadow-xl" {...props}>
+  <View
+    className="rounded-md bg-neutral-200 dark:bg-neutral-800 shadow-xl"
+    {...props}>
     <View className="p-3 gap-2">
-      <Text className="text-indigo-300 text-lg font-medium">{title}</Text>
-      {subtitle && (
-        <Text className="text-slate-500 dark:text-slate-400 text-sm">
-          {subtitle}
-        </Text>
-      )}
+      <Text className="text-indigo-500 text-lg font-medium">{title}</Text>
+      {subtitle && <Text className="text-neutral-400 text-sm">{subtitle}</Text>}
     </View>
   </View>
 );
